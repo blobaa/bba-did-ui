@@ -1,6 +1,11 @@
-import { Row } from 'react-bootstrap';
+import { Row, Tabs, Tab } from 'react-bootstrap';
 import Layout from '../components/common/Layout';
 import Page from '../components/common/Page';
+import CreateDID from '../components/CreateDID';
+import UpdateDDOT from '../components/UpdateDDOT';
+import UpdateController from '../components/UpdateController';
+import DeactivateDID from '../components/DeactivateDID';
+import ResolveDID from '../components/ResolveDID';
 
 
 const DemoHome: React.FC = () => {
@@ -14,6 +19,28 @@ const DemoHome: React.FC = () => {
                         This is the BBA DID Method UI
                     </div>
                 </Row>
+                <Tabs defaultActiveKey="create"  id="noanim-tab-example">
+                    <Tab eventKey="create" title="Create DID">
+                        <div style={{paddingTop: "1rem"}}/>
+                        <CreateDID />
+                    </Tab>
+                    <Tab eventKey="resolve" title="Resolve DID">
+                        <div style={{paddingTop: "1rem"}}/>
+                        <ResolveDID />
+                    </Tab>
+                    <Tab eventKey="updateDDOT" title="Update DDOT">
+                        <div style={{paddingTop: "1rem"}}/>
+                        <UpdateDDOT />
+                    </Tab>
+                    <Tab eventKey="updateController" title="Update DID Controller">
+                        <div style={{paddingTop: "1rem"}}/>
+                        <UpdateController />
+                    </Tab>
+                    <Tab eventKey="deactivate" title="Deactivate DID">
+                        <div style={{paddingTop: "1rem"}}/>
+                        <DeactivateDID />
+                    </Tab>
+                </Tabs>
             </Layout>
         </Page>
     );
