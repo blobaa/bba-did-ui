@@ -1,14 +1,15 @@
-import { account, chainCurrency, ChainCurrencyType, ChainId, GetBalanceResponse, request } from "@blobaa/ardor-ts";
-import { bbaMethodHandler, CreateDIDResponse } from "@blobaa/bba-did-method-handler-ts";
+import { account } from "@blobaa/ardor-ts";
+import { bbaMethodHandler, UpdateDIDDocumentResponse } from "@blobaa/bba-did-method-handler-ts";
 import { DIDDocKey, DIDDocKeyMaterial, DIDDocKeyType, DIDDocRelationship, DIDDocRelationshipType, DIDDocService, DIDDocument, DIDDocumentObject } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
-import { Button, Col, Form, Alert } from "react-bootstrap";
+import { Alert, Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
+import Funds from "../lib/Funds";
+import Time from "../lib/Time";
 import Error from "./lib/Error";
 import TextArea from "./lib/TextArea";
-import Time from "./../lib/Time"
-import Funds from "../lib/Funds";
+
 
 
 interface Props {
@@ -16,20 +17,15 @@ interface Props {
 }
 
 
-const CreateDID: React.FC<Props> = (props) => {
-    const [ isTestnet, setIsTestnet ] = useState(true);
+const UpdateDDOT: React.FC<Props> = (props) => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
-
     
-    const handleNetwork = () => {
-        setIsTestnet(!isTestnet);
-    }
-
 
     const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation();
 
+        const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
         const passphrase = (event.currentTarget.elements.namedItem("formPassphrase") as any).value as string;
         const keyType = (event.currentTarget.elements.namedItem("formKeyType") as any).value as string;
         const relationship = (event.currentTarget.elements.namedItem("formKeyRelationship") as any).value as string;
@@ -37,12 +33,16 @@ const CreateDID: React.FC<Props> = (props) => {
         const serviceType = (event.currentTarget.elements.namedItem("formServiceType") as any).value as string;
         const serviceUrl = (event.currentTarget.elements.namedItem("formServiceUrl") as any).value as string;
 
-        if(config.isDev) {
-            setResultFragment(createdDIDFragment(config.devDid.did, config.devDid.keyMaterial, passphrase))
+        if (config.isDev) {
+            const newDidObj = {
+                did: config.devDid.did.did,
+                newDidDocument: config.devDid.did.didDocument
+            }
+            setResultFragment(updatedDocFragment(newDidObj, config.devDid.keyMaterial, passphrase))
         } else {
-            createDID(keyType, relationship, serviceName, serviceType, serviceUrl, passphrase, isTestnet)
+            updateDocument(did, keyType, relationship, serviceName, serviceType, serviceUrl, passphrase)
             .then((resp) => {
-                setResultFragment(createdDIDFragment(resp.did, resp.keyMaterial, passphrase))
+                setResultFragment(updatedDocFragment(resp.did, resp.keyMaterial, passphrase))
             })
             .catch((error) => {
                 setResultFragment(<Error message={error} />);
@@ -55,6 +55,16 @@ const CreateDID: React.FC<Props> = (props) => {
         <div>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
+                    <Form.Group as={Col} sm="8" controlId="formDid">
+                        <Form.Label>DID:</Form.Label>
+                        <Form.Control type="text" placeholder="Enter bba did" />
+                        <Form.Text className="text-muted">
+                            Your bba DID you want to update.
+                        </Form.Text>
+                    </Form.Group>
+                </Form.Row>
+
+                <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
                         <Form.Label>DID Controller Passphrase:</Form.Label>
                         <Form.Control type="password" placeholder="Enter passphrase" />
@@ -64,28 +74,9 @@ const CreateDID: React.FC<Props> = (props) => {
                     </Form.Group>
                 </Form.Row>
 
-                <Form.Row>
-                    <Form.Group controlId="formNetwork">
-                        <Form.Label>Network</Form.Label>
-                        <Form.Group>
-                            <Form.Check 
-                                inline
-                                type="radio"
-                                checked={isTestnet}
-                                onChange={handleNetwork}
-                                label="Testnet" />
-                            <Form.Check
-                                inline
-                                type="radio"
-                                checked={!isTestnet}
-                                onChange={handleNetwork}
-                                label="Mainnet" />
-                        </Form.Group>
-                    </Form.Group>
-                </Form.Row>
                 
                 <Form.Group>
-                    <Form.Label>DID Document Key</Form.Label>
+                    <Form.Label>New DID Document Key</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formKeyType">
                             <Form.Label>Key Type:</Form.Label>
@@ -94,7 +85,7 @@ const CreateDID: React.FC<Props> = (props) => {
                                 <option>ED25519</option>
                             </Form.Control>
                             <Form.Text className="text-muted">
-                                Your DID Document Key Type
+                                Your new DID Document Key Type
                             </Form.Text>
                         </Form.Group>
                         <Form.Group as={Col} controlId="formKeyRelationship">
@@ -108,34 +99,34 @@ const CreateDID: React.FC<Props> = (props) => {
                                 <option>Capability Delegation</option>
                             </Form.Control>
                             <Form.Text className="text-muted">
-                                Your verification relationship the key will be used for. Select None if the key should be generic.
+                                Your new verification relationship the key will be used for. Select None if the key should be generic.
                             </Form.Text>
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
 
                 <Form.Group>
-                    <Form.Label>DID Document Service</Form.Label>
+                    <Form.Label>New DID Document Service</Form.Label>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formServiceName">
                             <Form.Label>Name:</Form.Label>
                             <Form.Control type="text" placeholder="Enter service name"/>
                             <Form.Text className="text-muted">
-                                The name of your service. Required for service creation
+                                The name of your new service. Required for service creation
                             </Form.Text>
                         </Form.Group>
                         <Form.Group as={Col} controlId="formServiceType">
                             <Form.Label>Type:</Form.Label>
                             <Form.Control type="text" placeholder="Enter service type"/>
                             <Form.Text className="text-muted">
-                                The type of your service. Required for service creation
+                                The type of your new service. Required for service creation
                             </Form.Text>
                         </Form.Group>
                         <Form.Group as={Col} controlId="formServiceUrl">
                             <Form.Label>URL:</Form.Label>
                             <Form.Control type="text" placeholder="Enter service endpoint URL"/>
                             <Form.Text className="text-muted">
-                                The endpoint of your service. Required for service creation
+                                The endpoint of your new service. Required for service creation
                             </Form.Text>
                         </Form.Group>
                     </Form.Row>
@@ -144,7 +135,7 @@ const CreateDID: React.FC<Props> = (props) => {
                 <Button 
                     variant="outline-primary"
                     type="submit">
-                    Create DID
+                    Update DID Document
                 </Button>
             </Form>
             <div style={{paddingTop: "2rem"}}/>
@@ -154,16 +145,19 @@ const CreateDID: React.FC<Props> = (props) => {
 }
 
 
-const createDID = async(
+const updateDocument = async(
+                        did: string,
                         keyType: string, 
                         relationship: string, 
                         serviceName: string, 
                         serviceType: string, 
                         serviceUrl: string,
                         passphrase: string,
-                        isTestnet: boolean
-                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: CreateDIDResponse}> => {
-    
+                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: UpdateDIDDocumentResponse}> => {
+
+    const didElements = did.split(":");
+    const isTestnet = didElements[2] === "t";
+
     const url = isTestnet ? config.url.testnet : config.url.mainnet;
     const accountRs = account.convertPassphraseToAccountRs(passphrase);
     const minBalance = isTestnet ? config.minIgnisBalance.testnet : config.minIgnisBalance.mainnet;
@@ -172,13 +166,13 @@ const createDID = async(
 
 
     const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
-    const createDIDResponse = await bbaMethodHandler.createDID(url, {
-        didDocumentTemplate: createDDOTReturn.ddot,
-        passphrase: passphrase,
-        isTestnetDid: isTestnet
+    const updateDocumentResponse = await bbaMethodHandler.updateDIDDocument(url, {
+        did: did,
+        newDidDocumentTemplate: createDDOTReturn.ddot,
+        passphrase: passphrase,    
     });
     
-    return { keyMaterial:  createDDOTReturn.keyMaterial, did: createDIDResponse}
+    return { keyMaterial:  createDDOTReturn.keyMaterial, did: updateDocumentResponse}
 }
 
 const createDDOT = async(
@@ -248,24 +242,24 @@ const createDDOT = async(
     return {ddot: document.publish(), keyMaterial: await key.exportKeyMaterial()}
 }
 
-const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMaterial, passphrase: string): React.ReactFragment => {
+const updatedDocFragment = (did: UpdateDIDDocumentResponse, keyMaterial: DIDDocKeyMaterial, passphrase: string): React.ReactFragment => {
     const controller = account.convertPassphraseToAccountRs(passphrase);
     
     const handleDownloadClicked = () => {
         const didInfo = {
             did: did.did,
-            didDoc: did.didDocument,
+            didDoc: did.newDidDocument,
             key: keyMaterial,
             controller: controller,
             timestamp: Time.getUnixTime()
         }
-        fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".created.json");
+        fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".updatedDoc.json");
     }
 
 
     return (
         <div>
-            <Alert variant="success">DID successfully created :)</Alert>
+            <Alert variant="success">DID Document successfully updated :)</Alert>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
@@ -294,12 +288,12 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
             </Form.Row>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
-                    <Form.Label>DID Document:</Form.Label>
+                    <Form.Label>New DID Document:</Form.Label>
                     <TextArea 
-                        value={JSON.stringify(did.didDocument, undefined, 2)}
+                        value={JSON.stringify(did.newDidDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
-                        The information linked to your DID
+                        The new information linked to your DID
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
@@ -312,7 +306,7 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                         value={JSON.stringify(keyMaterial, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
-                        Your key inside your DID Document. CAUTION: Save the key for later DID authentication. This key links you to the DID.
+                        Your key inside your new DID Document. CAUTION: Save the key for later DID authentication. This key links you to the DID.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
@@ -324,10 +318,10 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                         onClick={handleDownloadClicked}
                         variant="outline-primary"
                         size="lg">
-                        Save Created DID
+                        Save Updated DID
                     </Button>
                     <Form.Text className="text-muted">
-                        Save the DID information shown above in a &lt;did&gt;.created.json file.
+                        Save the DID information shown above in a &lt;did&gt;.updatedDoc.json file.
                     </Form.Text>
 
                 </Form.Group>
@@ -336,4 +330,4 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
     )
 }
 
-export default CreateDID;
+export default UpdateDDOT;

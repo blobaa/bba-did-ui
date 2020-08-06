@@ -2,7 +2,7 @@ import { Row, Tabs, Tab } from 'react-bootstrap';
 import Layout from '../components/common/Layout';
 import Page from '../components/common/Page';
 import CreateDID from '../components/CreateDID';
-import UpdateDDOT from '../components/UpdateDDOT';
+import UpdateDDOT from '../components/UpdateDocument';
 import UpdateController from '../components/UpdateController';
 import DeactivateDID from '../components/DeactivateDID';
 import ResolveDID from '../components/ResolveDID';
@@ -28,7 +28,7 @@ const DemoHome: React.FC = () => {
                         <div style={{paddingTop: "1rem"}}/>
                         <ResolveDID />
                     </Tab>
-                    <Tab eventKey="updateDDOT" title="Update DDOT">
+                    <Tab eventKey="updateDDOT" title="Update DID Document">
                         <div style={{paddingTop: "1rem"}}/>
                         <UpdateDDOT />
                     </Tab>
