@@ -1,22 +1,20 @@
-import { account, chainCurrency, ChainCurrencyType, ChainId, GetBalanceResponse, request } from "@blobaa/ardor-ts";
+import { account } from "@blobaa/ardor-ts";
 import { bbaMethodHandler, CreateDIDResponse } from "@blobaa/bba-did-method-handler-ts";
 import { DIDDocKey, DIDDocKeyMaterial, DIDDocKeyType, DIDDocRelationship, DIDDocRelationshipType, DIDDocService, DIDDocument, DIDDocumentObject } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
-import { Button, Col, Form, Alert } from "react-bootstrap";
+import { Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
-import Error from "./lib/Error";
-import TextArea from "./lib/TextArea";
-import Time from "./../lib/Time"
 import Funds from "../lib/Funds";
+import Time from "./../lib/Time";
+import Error from "./lib/Error";
+import Success from "./lib/Success";
+import TextArea from "./lib/TextArea";
 
 
-interface Props {
-    test?: string;
-}
+const formSpace = "0.4rem";
 
-
-const CreateDID: React.FC<Props> = (props) => {
+const CreateDID: React.FC= () => {
     const [ isTestnet, setIsTestnet ] = useState(true);
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
 
@@ -53,6 +51,7 @@ const CreateDID: React.FC<Props> = (props) => {
     
     return (
         <div>
+            <div style={{paddingTop: "1rem"}}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
@@ -63,10 +62,10 @@ const CreateDID: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: formSpace}}/>
                 <Form.Row>
                     <Form.Group controlId="formNetwork">
-                        <Form.Label>Network</Form.Label>
+                        <Form.Label>Network:</Form.Label>
                         <Form.Group>
                             <Form.Check 
                                 inline
@@ -83,7 +82,7 @@ const CreateDID: React.FC<Props> = (props) => {
                         </Form.Group>
                     </Form.Group>
                 </Form.Row>
-                
+                <div style={{paddingTop: formSpace}}/>
                 <Form.Group>
                     <Form.Label>DID Document Key</Form.Label>
                     <Form.Row>
@@ -113,7 +112,7 @@ const CreateDID: React.FC<Props> = (props) => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-
+                <div style={{paddingTop: formSpace}}/>
                 <Form.Group>
                     <Form.Label>DID Document Service</Form.Label>
                     <Form.Row>
@@ -140,14 +139,14 @@ const CreateDID: React.FC<Props> = (props) => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-
+                <div style={{paddingTop: formSpace}}/>
                 <Button 
                     variant="outline-primary"
                     type="submit">
                     Create DID
                 </Button>
             </Form>
-            <div style={{paddingTop: "2rem"}}/>
+            <div style={{paddingTop: "3rem"}}/>
             {resultFragment}
         </div>
     );
@@ -265,7 +264,9 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
 
     return (
         <div>
-            <Alert variant="success">DID successfully created :)</Alert>
+            <Success message="DID successfully created :)"/>
+            <div style={{paddingTop: "1rem"}}/>
+            <p style={{fontSize: "1.8rem"}}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
@@ -279,6 +280,7 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
+            <div style={{paddingTop: formSpace}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
@@ -292,6 +294,7 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
+            <div style={{paddingTop: formSpace}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document:</Form.Label>
@@ -303,7 +306,7 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
+            <div style={{paddingTop: formSpace}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document Key:</Form.Label>
@@ -316,8 +319,7 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
-            <div style={{paddingTop: "1rem"}} />
+            <div style={{paddingTop: "2rem"}} />
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button
@@ -329,7 +331,6 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                     <Form.Text className="text-muted">
                         Save the DID information shown above in a &lt;did&gt;.created.json file.
                     </Form.Text>
-
                 </Form.Group>
             </Form.Row>
         </div>
