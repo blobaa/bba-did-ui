@@ -1,19 +1,15 @@
 import { bbaMethodHandler, ResolveDIDResponse } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
-import { Alert, Button, Col, Form } from "react-bootstrap";
+import { Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
 import Time from "./../lib/Time";
 import Error from "./lib/Error";
+import Success from "./lib/Success";
 import TextArea from "./lib/TextArea";
 
 
-interface Props {
-    test?: string;
-}
-
-
-const ResolveDID: React.FC<Props> = (props) => {
+const ResolveDID: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
 
     
@@ -21,10 +17,16 @@ const ResolveDID: React.FC<Props> = (props) => {
         event.preventDefault();
         event.stopPropagation();
 
+
         const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
 
+
         if(config.isDev) {
-            setResultFragment(resolvedDIDFragment({did: config.devDid.did.did, didDocument: config.devDid.did.didDocument}))
+            const devResp = {
+                did: config.devDid.did.did,
+                didDocument: config.devDid.did.didDocument
+            };
+            setResultFragment(resolvedDIDFragment(devResp))
         } else {
             resolveDID(did)
             .then((resp) => {
@@ -40,6 +42,7 @@ const ResolveDID: React.FC<Props> = (props) => {
     
     return (
         <div>
+            <div style={{paddingTop: "1rem"}}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
@@ -50,14 +53,14 @@ const ResolveDID: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: "1rem"}}/>
                 <Button 
                     variant="outline-primary"
                     type="submit">
                     Resolve DID
                 </Button>
             </Form>
-            <div style={{paddingTop: "2rem"}}/>
+            <div style={{paddingTop: "3rem"}}/>
             {resultFragment}
         </div>
     );
@@ -69,17 +72,19 @@ const resolveDID = async( did: string): Promise<ResolveDIDResponse> => {
     return bbaMethodHandler.resolveDID(url, { did });
 }
 
-const resolvedDIDFragment = (resolveResponse: ResolveDIDResponse): React.ReactFragment => {
+const resolvedDIDFragment = (params: ResolveDIDResponse): React.ReactFragment => {
     
     const handleDownloadClicked = () => {
-        const didInfo = {...resolveResponse, timestamp: Time.getUnixTime()};
+        const didInfo = {...params, timestamp: Time.getUnixTime()};
         fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".resolved.json");
     }
 
 
     return (
         <div>
-            <Alert variant="success">DID successfully resolved :)</Alert>
+            <Success message="DID successfully resolved :)"/>
+            <div style={{paddingTop: "1rem"}}/>
+            <p style={{fontSize: "1.8rem"}}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
@@ -87,18 +92,18 @@ const resolvedDIDFragment = (resolveResponse: ResolveDIDResponse): React.ReactFr
                         type="text"
                         readOnly 
                         style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
-                        value={resolveResponse.did}/>
+                        value={params.did}/>
                     <Form.Text className="text-muted">
                         The resolved decentralized identifier (DID)
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document:</Form.Label>
                     <TextArea 
-                        value={JSON.stringify(resolveResponse.didDocument, undefined, 2)}
+                        value={JSON.stringify(params.didDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
                         The information linked to the DID
@@ -106,7 +111,7 @@ const resolvedDIDFragment = (resolveResponse: ResolveDIDResponse): React.ReactFr
                 </Form.Group>
             </Form.Row>
 
-            <div style={{paddingTop: "1rem"}} />
+            <div style={{paddingTop: "2rem"}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button

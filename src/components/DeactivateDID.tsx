@@ -2,19 +2,15 @@ import { account } from "@blobaa/ardor-ts";
 import { bbaMethodHandler } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
-import { Alert, Button, Col, Form } from "react-bootstrap";
+import { Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
 import Error from "./lib/Error";
+import Success from "./lib/Success";
 
 
-interface Props {
-    test?: string;
-}
-
-
-const DeactivateDID: React.FC<Props> = (props) => {
+const DeactivateDID: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
     
 
@@ -22,14 +18,16 @@ const DeactivateDID: React.FC<Props> = (props) => {
         event.preventDefault();
         event.stopPropagation();
 
+
         const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
         const passphrase = (event.currentTarget.elements.namedItem("formPassphrase") as any).value as string;
+
 
         if (config.isDev) {
             const devResp = {
                 deactivatedDid: config.devDid.did.did,
                 controller: config.devDid.account
-            }
+            };
             setResultFragment(deactivatedDIDFragment(devResp));
         } else {
             deactivateDID(did, passphrase)
@@ -37,7 +35,8 @@ const DeactivateDID: React.FC<Props> = (props) => {
                 setResultFragment(deactivatedDIDFragment(resp));
             })
             .catch((error) => {
-                setResultFragment(<Error message={error} />);
+                console.log(error)
+                setResultFragment(<Error message={"Couldn't deactivate DID :("} />);
             })
         }
     }
@@ -45,6 +44,7 @@ const DeactivateDID: React.FC<Props> = (props) => {
     
     return (
         <div>
+            <div style={{paddingTop: "1rem"}}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
@@ -55,7 +55,7 @@ const DeactivateDID: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
                         <Form.Label>DID Controller Passphrase:</Form.Label>
@@ -65,14 +65,14 @@ const DeactivateDID: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: "1rem"}}/>
                 <Button 
                     variant="outline-primary"
                     type="submit">
                     Deactivate DID
                 </Button>
             </Form>
-            <div style={{paddingTop: "2rem"}}/>
+            <div style={{paddingTop: "3rem"}}/>
             {resultFragment}
         </div>
     );
@@ -112,7 +112,9 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string, controller: s
 
     return (
         <div>
-            <Alert variant="success">DID successfully deactivated :)</Alert>
+            <Success message="DID successfully deactivated :)"/>
+            <div style={{paddingTop: "1rem"}}/>
+            <p style={{fontSize: "1.8rem"}}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
@@ -126,7 +128,7 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string, controller: s
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
@@ -140,9 +142,7 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string, controller: s
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
-
-            <div style={{paddingTop: "1rem"}} />
+            <div style={{paddingTop: "2rem"}} />
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button
@@ -153,7 +153,6 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string, controller: s
                     <Form.Text className="text-muted">
                         Save the DID information shown above in a &lt;did&gt;.deactivated.json file.
                     </Form.Text>
-
                 </Form.Group>
             </Form.Row>
         </div>

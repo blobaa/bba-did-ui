@@ -8,6 +8,9 @@ import DeactivateDID from '../components/DeactivateDID';
 import ResolveDID from '../components/ResolveDID';
 
 
+const formSpacing = "0.4rem";
+
+
 const DemoHome: React.FC = () => {
     return (
         <Page>
@@ -22,7 +25,7 @@ const DemoHome: React.FC = () => {
                 <Tabs defaultActiveKey="create"  id="noanim-tab-example">
                     <Tab eventKey="create" title="Create DID">
                         <div style={{paddingTop: "1rem"}}/>
-                        <CreateDID />
+                        <CreateDID formSpacing={formSpacing}/>
                     </Tab>
                     <Tab eventKey="resolve" title="Resolve DID">
                         <div style={{paddingTop: "1rem"}}/>
@@ -30,15 +33,15 @@ const DemoHome: React.FC = () => {
                     </Tab>
                     <Tab eventKey="updateDDOT" title="Update DID Document">
                         <div style={{paddingTop: "1rem"}}/>
-                        <UpdateDDOT />
+                        <UpdateDDOT formSpacing={formSpacing}/>
                     </Tab>
                     <Tab eventKey="updateController" title="Update DID Controller">
                         <div style={{paddingTop: "1rem"}}/>
-                        <UpdateController />
+                        <UpdateController formSpacing={formSpacing}/>
                     </Tab>
                     <Tab eventKey="deactivate" title="Deactivate DID">
                         <div style={{paddingTop: "1rem"}}/>
-                        <DeactivateDID />
+                        <DeactivateDID formSpacing={formSpacing}/>
                     </Tab>
                 </Tabs>
             </Layout>

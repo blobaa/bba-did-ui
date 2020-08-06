@@ -10,9 +10,8 @@ import Time from "./../lib/Time";
 import Error from "./lib/Error";
 import Success from "./lib/Success";
 import TextArea from "./lib/TextArea";
+import DDOT from "../lib/DDOT";
 
-
-const formSpace = "0.4rem";
 
 const CreateDID: React.FC= () => {
     const [ isTestnet, setIsTestnet ] = useState(true);
@@ -28,6 +27,7 @@ const CreateDID: React.FC= () => {
         event.preventDefault();
         event.stopPropagation();
 
+
         const passphrase = (event.currentTarget.elements.namedItem("formPassphrase") as any).value as string;
         const keyType = (event.currentTarget.elements.namedItem("formKeyType") as any).value as string;
         const relationship = (event.currentTarget.elements.namedItem("formKeyRelationship") as any).value as string;
@@ -35,15 +35,22 @@ const CreateDID: React.FC= () => {
         const serviceType = (event.currentTarget.elements.namedItem("formServiceType") as any).value as string;
         const serviceUrl = (event.currentTarget.elements.namedItem("formServiceUrl") as any).value as string;
 
+
         if(config.isDev) {
-            setResultFragment(createdDIDFragment(config.devDid.did, config.devDid.keyMaterial, passphrase))
+            const devResp = {
+                did: config.devDid.did,
+                keyMaterial: config.devDid.keyMaterial,
+                controller: config.devDid.account
+            };
+            setResultFragment(createdDIDFragment(devResp))
         } else {
             createDID(keyType, relationship, serviceName, serviceType, serviceUrl, passphrase, isTestnet)
             .then((resp) => {
-                setResultFragment(createdDIDFragment(resp.did, resp.keyMaterial, passphrase))
+                setResultFragment(createdDIDFragment(resp))
             })
             .catch((error) => {
-                setResultFragment(<Error message={error} />);
+                console.log(error)
+                setResultFragment(<Error message={"Couldn't create DID :("} />);
             })
         }
     }
@@ -62,7 +69,7 @@ const CreateDID: React.FC= () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: formSpace}}/>
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Row>
                     <Form.Group controlId="formNetwork">
                         <Form.Label>Network:</Form.Label>
@@ -82,7 +89,7 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: formSpace}}/>
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Group>
                     <Form.Label>DID Document Key</Form.Label>
                     <Form.Row>
@@ -112,7 +119,7 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{paddingTop: formSpace}}/>
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Group>
                     <Form.Label>DID Document Service</Form.Label>
                     <Form.Row>
@@ -139,7 +146,7 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{paddingTop: formSpace}}/>
+                <div style={{paddingTop: "1rem"}}/>
                 <Button 
                     variant="outline-primary"
                     type="submit">
@@ -161,7 +168,7 @@ const createDID = async(
                         serviceUrl: string,
                         passphrase: string,
                         isTestnet: boolean
-                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: CreateDIDResponse}> => {
+                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: CreateDIDResponse, controller: string}> => {
     
     const url = isTestnet ? config.url.testnet : config.url.mainnet;
     const accountRs = account.convertPassphraseToAccountRs(passphrase);
@@ -170,14 +177,15 @@ const createDID = async(
     await Funds.checkFunds(url, accountRs, minBalance);
 
 
-    const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
+    const createDDOTReturn = await DDOT.create(keyType, relationship, serviceName, serviceType, serviceUrl);
+    // const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
     const createDIDResponse = await bbaMethodHandler.createDID(url, {
         didDocumentTemplate: createDDOTReturn.ddot,
         passphrase: passphrase,
         isTestnetDid: isTestnet
     });
     
-    return { keyMaterial:  createDDOTReturn.keyMaterial, did: createDIDResponse}
+    return { keyMaterial:  createDDOTReturn.keyMaterial, did: createDIDResponse, controller: accountRs}
 }
 
 const createDDOT = async(
@@ -247,15 +255,14 @@ const createDDOT = async(
     return {ddot: document.publish(), keyMaterial: await key.exportKeyMaterial()}
 }
 
-const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMaterial, passphrase: string): React.ReactFragment => {
-    const controller = account.convertPassphraseToAccountRs(passphrase);
+const createdDIDFragment = (params: {did: CreateDIDResponse, keyMaterial: DIDDocKeyMaterial, controller: string}): React.ReactFragment => {
     
     const handleDownloadClicked = () => {
         const didInfo = {
-            did: did.did,
-            didDoc: did.didDocument,
-            key: keyMaterial,
-            controller: controller,
+            did: params.did.did,
+            didDoc: params.did.didDocument,
+            key: params.keyMaterial,
+            controller: params.controller,
             timestamp: Time.getUnixTime()
         }
         fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".created.json");
@@ -274,13 +281,13 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                         type="text"
                         readOnly 
                         style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
-                        value={did.did}/>
+                        value={params.did.did}/>
                     <Form.Text className="text-muted">
                         Your decentralized identifier (DID)
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: formSpace}}/>
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
@@ -288,31 +295,31 @@ const createdDIDFragment = (did: CreateDIDResponse, keyMaterial: DIDDocKeyMateri
                         type="text"
                         readOnly 
                         style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
-                        value={controller}/>
+                        value={params.controller}/>
                     <Form.Text className="text-muted">
                         Your DID controller account
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: formSpace}}/>
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document:</Form.Label>
                     <TextArea 
-                        value={JSON.stringify(did.didDocument, undefined, 2)}
+                        value={JSON.stringify(params.did.didDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
                         The information linked to your DID
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: formSpace}}/>
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document Key:</Form.Label>
                     <TextArea
                         height="15rem"
-                        value={JSON.stringify(keyMaterial, undefined, 2)}
+                        value={JSON.stringify(params.keyMaterial, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
                         Your key inside your DID Document. CAUTION: Save the key for later DID authentication. This key links you to the DID.

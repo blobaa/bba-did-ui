@@ -7,14 +7,10 @@ import config from "../../config";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
 import Error from "./lib/Error";
+import Success from "./lib/Success";
 
 
-interface Props {
-    test?: string;
-}
-
-
-const UpdateController: React.FC<Props> = (props) => {
+const UpdateController: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
     
 
@@ -22,24 +18,27 @@ const UpdateController: React.FC<Props> = (props) => {
         event.preventDefault();
         event.stopPropagation();
 
+
         const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
         const currentPassphrase = (event.currentTarget.elements.namedItem("formCurrentPassphrase") as any).value as string;
         const newPassphrase = (event.currentTarget.elements.namedItem("formNewPassphrase") as any).value as string;
 
+        
         if (config.isDev) {
-            const controllerResp = {
+            const devResp = {
                 did: config.devDid.did.did,
                 oldControllerAccount: config.devDid.account,
                 newControllerAccount: config.devDid.newAccount
             }
-            setResultFragment(updatedControllerFragment(controllerResp));
+            setResultFragment(updatedControllerFragment(devResp));
         } else {
             updateController(did, currentPassphrase, newPassphrase)
             .then((resp) => {
                 setResultFragment(updatedControllerFragment(resp));
             })
             .catch((error) => {
-                setResultFragment(<Error message={error} />);
+                console.log(error)
+                setResultFragment(<Error message={"Couldn't update DID Controller :("} />);
             })
         }
     }
@@ -47,6 +46,7 @@ const UpdateController: React.FC<Props> = (props) => {
     
     return (
         <div>
+            <div style={{paddingTop: "1rem"}}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
@@ -57,7 +57,7 @@ const UpdateController: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formCurrentPassphrase">
                         <Form.Label>Current DID Controller Passphrase:</Form.Label>
@@ -67,7 +67,7 @@ const UpdateController: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formNewPassphrase">
                         <Form.Label>New DID Controller Passphrase:</Form.Label>
@@ -77,14 +77,14 @@ const UpdateController: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: "1rem"}}/>
                 <Button 
                     variant="outline-primary"
                     type="submit">
                     Update DID Controller
                 </Button>
             </Form>
-            <div style={{paddingTop: "2rem"}}/>
+            <div style={{paddingTop: "3rem"}}/>
             {resultFragment}
         </div>
     );
@@ -130,7 +130,9 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
 
     return (
         <div>
-            <Alert variant="success">DID Controller successfully updated :)</Alert>
+            <Success message="DID Controller successfully updated :)"/>
+            <div style={{paddingTop: "1rem"}}/>
+            <p style={{fontSize: "1.8rem"}}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
@@ -144,7 +146,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="6">
                     <Form.Label>Old DID Controller:</Form.Label>
@@ -169,9 +171,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
-
-            <div style={{paddingTop: "1rem"}} />
+            <div style={{paddingTop: "2rem"}} />
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button
@@ -182,7 +182,6 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                     <Form.Text className="text-muted">
                         Save the DID information shown above in a &lt;did&gt;.updatedController.json file.
                     </Form.Text>
-
                 </Form.Group>
             </Form.Row>
         </div>

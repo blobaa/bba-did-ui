@@ -3,27 +3,24 @@ import { bbaMethodHandler, UpdateDIDDocumentResponse } from "@blobaa/bba-did-met
 import { DIDDocKey, DIDDocKeyMaterial, DIDDocKeyType, DIDDocRelationship, DIDDocRelationshipType, DIDDocService, DIDDocument, DIDDocumentObject } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
-import { Alert, Button, Col, Form } from "react-bootstrap";
+import { Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
 import Error from "./lib/Error";
+import Success from "./lib/Success";
 import TextArea from "./lib/TextArea";
+import DDOT from "./../lib/DDOT";
 
 
-
-interface Props {
-    test?: string;
-}
-
-
-const UpdateDDOT: React.FC<Props> = (props) => {
+const UpdateDDOT: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
     
 
     const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation();
+
 
         const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
         const passphrase = (event.currentTarget.elements.namedItem("formPassphrase") as any).value as string;
@@ -33,19 +30,25 @@ const UpdateDDOT: React.FC<Props> = (props) => {
         const serviceType = (event.currentTarget.elements.namedItem("formServiceType") as any).value as string;
         const serviceUrl = (event.currentTarget.elements.namedItem("formServiceUrl") as any).value as string;
 
+
         if (config.isDev) {
-            const newDidObj = {
-                did: config.devDid.did.did,
-                newDidDocument: config.devDid.did.didDocument
-            }
-            setResultFragment(updatedDocFragment(newDidObj, config.devDid.keyMaterial, passphrase))
+            const devResp = {
+                did: {
+                    did: config.devDid.did.did,
+                    newDidDocument: config.devDid.did.didDocument
+                },
+                controller: config.devDid.account,
+                keyMaterial: config.devDid.keyMaterial
+            };
+            setResultFragment(updatedDocFragment(devResp));
         } else {
             updateDocument(did, keyType, relationship, serviceName, serviceType, serviceUrl, passphrase)
             .then((resp) => {
-                setResultFragment(updatedDocFragment(resp.did, resp.keyMaterial, passphrase))
+                setResultFragment(updatedDocFragment(resp))
             })
             .catch((error) => {
-                setResultFragment(<Error message={error} />);
+                console.log(error)
+                setResultFragment(<Error message={"Couldn't update DID Document :("} />);
             })
         }
     }
@@ -53,6 +56,7 @@ const UpdateDDOT: React.FC<Props> = (props) => {
     
     return (
         <div>
+            <div style={{paddingTop: "1rem"}}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
@@ -63,7 +67,7 @@ const UpdateDDOT: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
                         <Form.Label>DID Controller Passphrase:</Form.Label>
@@ -73,8 +77,7 @@ const UpdateDDOT: React.FC<Props> = (props) => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-
-                
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Group>
                     <Form.Label>New DID Document Key</Form.Label>
                     <Form.Row>
@@ -104,7 +107,7 @@ const UpdateDDOT: React.FC<Props> = (props) => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-
+                <div style={{paddingTop: config.formSpacing}}/>
                 <Form.Group>
                     <Form.Label>New DID Document Service</Form.Label>
                     <Form.Row>
@@ -131,14 +134,14 @@ const UpdateDDOT: React.FC<Props> = (props) => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-
+                <div style={{paddingTop: "1rem"}}/>
                 <Button 
                     variant="outline-primary"
                     type="submit">
                     Update DID Document
                 </Button>
             </Form>
-            <div style={{paddingTop: "2rem"}}/>
+            <div style={{paddingTop: "3rem"}}/>
             {resultFragment}
         </div>
     );
@@ -153,7 +156,7 @@ const updateDocument = async(
                         serviceType: string, 
                         serviceUrl: string,
                         passphrase: string,
-                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: UpdateDIDDocumentResponse}> => {
+                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: UpdateDIDDocumentResponse, controller: string}> => {
 
     const didElements = did.split(":");
     const isTestnet = didElements[2] === "t";
@@ -165,14 +168,15 @@ const updateDocument = async(
     await Funds.checkFunds(url, accountRs, minBalance);
 
 
-    const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
+    const createDDOTReturn = await DDOT.create(keyType, relationship, serviceName, serviceType, serviceUrl);
+    // const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
     const updateDocumentResponse = await bbaMethodHandler.updateDIDDocument(url, {
         did: did,
         newDidDocumentTemplate: createDDOTReturn.ddot,
         passphrase: passphrase,    
     });
     
-    return { keyMaterial:  createDDOTReturn.keyMaterial, did: updateDocumentResponse}
+    return { keyMaterial:  createDDOTReturn.keyMaterial, did: updateDocumentResponse, controller: accountRs };
 }
 
 const createDDOT = async(
@@ -242,15 +246,14 @@ const createDDOT = async(
     return {ddot: document.publish(), keyMaterial: await key.exportKeyMaterial()}
 }
 
-const updatedDocFragment = (did: UpdateDIDDocumentResponse, keyMaterial: DIDDocKeyMaterial, passphrase: string): React.ReactFragment => {
-    const controller = account.convertPassphraseToAccountRs(passphrase);
+const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse, keyMaterial: DIDDocKeyMaterial, controller: string}): React.ReactFragment => {
     
     const handleDownloadClicked = () => {
         const didInfo = {
-            did: did.did,
-            didDoc: did.newDidDocument,
-            key: keyMaterial,
-            controller: controller,
+            did: params.did.did,
+            didDoc: params.did.newDidDocument,
+            key: params.keyMaterial,
+            controller: params.controller,
             timestamp: Time.getUnixTime()
         }
         fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".updatedDoc.json");
@@ -259,7 +262,9 @@ const updatedDocFragment = (did: UpdateDIDDocumentResponse, keyMaterial: DIDDocK
 
     return (
         <div>
-            <Alert variant="success">DID Document successfully updated :)</Alert>
+            <Success message="DID Document successfully updated :)"/>
+            <div style={{paddingTop: "1rem"}}/>
+            <p style={{fontSize: "1.8rem"}}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
@@ -267,12 +272,13 @@ const updatedDocFragment = (did: UpdateDIDDocumentResponse, keyMaterial: DIDDocK
                         type="text"
                         readOnly 
                         style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
-                        value={did.did}/>
+                        value={params.did.did}/>
                     <Form.Text className="text-muted">
                         Your decentralized identifier (DID)
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
@@ -280,38 +286,38 @@ const updatedDocFragment = (did: UpdateDIDDocumentResponse, keyMaterial: DIDDocK
                         type="text"
                         readOnly 
                         style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
-                        value={controller}/>
+                        value={params.controller}/>
                     <Form.Text className="text-muted">
                         Your DID controller account
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>New DID Document:</Form.Label>
                     <TextArea 
-                        value={JSON.stringify(did.newDidDocument, undefined, 2)}
+                        value={JSON.stringify(params.did.newDidDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
                         The new information linked to your DID
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
+            <div style={{paddingTop: config.formSpacing}}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document Key:</Form.Label>
                     <TextArea
                         height="15rem"
-                        value={JSON.stringify(keyMaterial, undefined, 2)}
+                        value={JSON.stringify(params.keyMaterial, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
                         Your key inside your new DID Document. CAUTION: Save the key for later DID authentication. This key links you to the DID.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-
-            <div style={{paddingTop: "1rem"}} />
+            <div style={{paddingTop: "2rem"}} />
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button
@@ -323,7 +329,6 @@ const updatedDocFragment = (did: UpdateDIDDocumentResponse, keyMaterial: DIDDocK
                     <Form.Text className="text-muted">
                         Save the DID information shown above in a &lt;did&gt;.updatedDoc.json file.
                     </Form.Text>
-
                 </Form.Group>
             </Form.Row>
         </div>
