@@ -146,7 +146,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
             </Form.Row>
 
             <Form.Row>
-                <Form.Group as={Col} sm="8">
+                <Form.Group as={Col} sm="6">
                     <Form.Label>Old DID Controller:</Form.Label>
                     <Form.Control 
                         type="text"
@@ -157,10 +157,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                         Your old DID controller account
                     </Form.Text>
                 </Form.Group>
-            </Form.Row>
-
-            <Form.Row>
-                <Form.Group as={Col} sm="8">
+                <Form.Group as={Col} sm="6">
                     <Form.Label>New DID Controller:</Form.Label>
                     <Form.Control 
                         type="text"
@@ -179,8 +176,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                 <Form.Group as={Col} sm="12">
                     <Button
                         onClick={handleDownloadClicked}
-                        variant="outline-primary"
-                        size="lg">
+                        variant="outline-primary">
                         Save Updated DID
                     </Button>
                     <Form.Text className="text-muted">
