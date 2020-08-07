@@ -1,64 +1,64 @@
 import { account } from "@blobaa/ardor-ts";
 import { bbaMethodHandler, CreateDIDResponse } from "@blobaa/bba-did-method-handler-ts";
-import { DIDDocKey, DIDDocKeyMaterial, DIDDocKeyType, DIDDocRelationship, DIDDocRelationshipType, DIDDocService, DIDDocument, DIDDocumentObject } from "@blobaa/did-document-ts";
+import { DIDDocKeyMaterial } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
+import DDOT from "../lib/DDOT";
 import Funds from "../lib/Funds";
 import Time from "./../lib/Time";
 import Error from "./lib/Error";
 import Success from "./lib/Success";
 import TextArea from "./lib/TextArea";
-import DDOT from "../lib/DDOT";
 
 
 const CreateDID: React.FC= () => {
     const [ isTestnet, setIsTestnet ] = useState(true);
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
 
-    
-    const handleNetwork = () => {
+
+    const handleNetwork = (): void => {
         setIsTestnet(!isTestnet);
-    }
+    };
 
 
-    const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
         event.stopPropagation();
 
-
+        /*eslint-disable @typescript-eslint/no-explicit-any*/
         const passphrase = (event.currentTarget.elements.namedItem("formPassphrase") as any).value as string;
         const keyType = (event.currentTarget.elements.namedItem("formKeyType") as any).value as string;
         const relationship = (event.currentTarget.elements.namedItem("formKeyRelationship") as any).value as string;
         const serviceName = (event.currentTarget.elements.namedItem("formServiceName") as any).value as string;
         const serviceType = (event.currentTarget.elements.namedItem("formServiceType") as any).value as string;
         const serviceUrl = (event.currentTarget.elements.namedItem("formServiceUrl") as any).value as string;
+        /*eslint-enable @typescript-eslint/no-explicit-any*/
 
-
-        if(config.isDev) {
+        if (config.isDev) {
             const devResp = {
                 did: config.devDid.did,
                 keyMaterial: config.devDid.keyMaterial,
                 controller: config.devDid.account
             };
-            setResultFragment(createdDIDFragment(devResp))
+            setResultFragment(createdDIDFragment(devResp));
         } else {
             createDID(keyType, relationship, serviceName, serviceType, serviceUrl, passphrase, isTestnet)
             .then((resp) => {
-                setResultFragment(createdDIDFragment(resp))
+                setResultFragment(createdDIDFragment(resp));
             })
             .catch((error) => {
-                console.log(error)
+                console.log(error);
                 setResultFragment(<Error message={"Couldn't create DID :("} />);
-            })
+            });
         }
-    }
+    };
 
-    
+
     return (
         <div>
-            <div style={{paddingTop: "1rem"}}/>
+            <div style={{ paddingTop: "1rem" }}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
@@ -69,12 +69,12 @@ const CreateDID: React.FC= () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Row>
                     <Form.Group controlId="formNetwork">
                         <Form.Label>Network:</Form.Label>
                         <Form.Group>
-                            <Form.Check 
+                            <Form.Check
                                 inline
                                 type="radio"
                                 checked={isTestnet}
@@ -89,7 +89,7 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Group>
                     <Form.Label>DID Document Key</Form.Label>
                     <Form.Row>
@@ -119,7 +119,7 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Group>
                     <Form.Label>DID Document Service</Form.Label>
                     <Form.Row>
@@ -146,30 +146,30 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{paddingTop: "1rem"}}/>
-                <Button 
+                <div style={{ paddingTop: "1rem" }}/>
+                <Button
                     variant="outline-primary"
                     type="submit">
                     Create DID
                 </Button>
             </Form>
-            <div style={{paddingTop: "3rem"}}/>
+            <div style={{ paddingTop: "3rem" }}/>
             {resultFragment}
         </div>
     );
-}
+};
 
 
 const createDID = async(
-                        keyType: string, 
-                        relationship: string, 
-                        serviceName: string, 
-                        serviceType: string, 
+                        keyType: string,
+                        relationship: string,
+                        serviceName: string,
+                        serviceType: string,
                         serviceUrl: string,
                         passphrase: string,
                         isTestnet: boolean
-                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: CreateDIDResponse, controller: string}> => {
-    
+                    ): Promise<{keyMaterial: DIDDocKeyMaterial; did: CreateDIDResponse; controller: string}> => {
+
     const url = isTestnet ? config.url.testnet : config.url.mainnet;
     const accountRs = account.convertPassphraseToAccountRs(passphrase);
     const minBalance = isTestnet ? config.minIgnisBalance.testnet : config.minIgnisBalance.mainnet;
@@ -181,131 +181,64 @@ const createDID = async(
     // const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
     const createDIDResponse = await bbaMethodHandler.createDID(url, {
         didDocumentTemplate: createDDOTReturn.ddot,
-        passphrase: passphrase,
+        passphrase,
         isTestnetDid: isTestnet
     });
-    
-    return { keyMaterial:  createDDOTReturn.keyMaterial, did: createDIDResponse, controller: accountRs}
-}
 
-const createDDOT = async(
-                        keyType: string, 
-                        relationship: string, 
-                        serviceName: string, 
-                        serviceType: string, 
-                        serviceUrl: string
-                    ): Promise<{ ddot: DIDDocumentObject, keyMaterial: DIDDocKeyMaterial}> => {
+    return { keyMaterial:  createDDOTReturn.keyMaterial, did: createDIDResponse, controller: accountRs };
+};
 
-    let key = {} as DIDDocKey;
+const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDocKeyMaterial; controller: string}): React.ReactFragment => {
 
-    if (keyType === "RSA") {
-        key = new DIDDocKey({keyType: DIDDocKeyType.RSA})
-    } else {
-        key = new DIDDocKey({keyType: DIDDocKeyType.Ed25519})
-    }
-
-    await key.generate();
-    const publicKey = key.publish();
-    
-
-    let _relationship: undefined | DIDDocRelationship;
-    let relationshipType = DIDDocRelationshipType.ASSERTION_METHOD;
-
-    if (relationship === "Authentication") {
-        relationshipType = DIDDocRelationshipType.AUTHENTICATION
-    }
-    if (relationship === "Assertion Method") {
-        relationshipType = DIDDocRelationshipType.ASSERTION_METHOD
-    }
-    if (relationship === "Capability Delegation") {
-        relationshipType = DIDDocRelationshipType.CAPABILITY_DELEGATION
-    }
-    if (relationship === "Capability Invocation") {
-        relationshipType = DIDDocRelationshipType.CAPABILITY_INVOCATION
-    }
-    if (relationship === "Key Agreement") {
-        relationshipType = DIDDocRelationshipType.KEY_AGREEMENT
-    }
-
-    if (relationship !== "None") {
-        _relationship = new DIDDocRelationship({
-            relationshipType: relationshipType,
-            publicKeys: [ publicKey ]
-        })
-    }
-
-
-    let service: undefined | DIDDocService;
-    if (serviceName && serviceType && serviceUrl) {
-        service = new DIDDocService({
-            name: serviceName,
-            type: serviceType,
-            serviceEndpoint: serviceUrl
-        });
-    }
-
-
-    const document = new DIDDocument({
-        publicKeys: _relationship ? undefined : [ publicKey ],
-        relationships: _relationship ? [ _relationship ] : undefined,
-        services: service ? [ service ] : undefined,
-    });
-
-
-    return {ddot: document.publish(), keyMaterial: await key.exportKeyMaterial()}
-}
-
-const createdDIDFragment = (params: {did: CreateDIDResponse, keyMaterial: DIDDocKeyMaterial, controller: string}): React.ReactFragment => {
-    
-    const handleDownloadClicked = () => {
+    const handleDownloadClicked = (): void => {
         const didInfo = {
             did: params.did.did,
             didDoc: params.did.didDocument,
             key: params.keyMaterial,
             controller: params.controller,
             timestamp: Time.getUnixTime()
-        }
+        };
         fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".created.json");
-    }
+    };
 
 
     return (
         <div>
             <Success message="DID successfully created :)"/>
-            <div style={{paddingTop: "1rem"}}/>
-            <p style={{fontSize: "1.8rem"}}>Results</p>
+            <div style={{ paddingTop: "1rem" }}/>
+            <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
-                    <Form.Control 
+                    <Form.Control
                         type="text"
-                        readOnly 
-                        style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+                        readOnly
+                        style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.did.did}/>
                     <Form.Text className="text-muted">
                         Your decentralized identifier (DID)
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: config.formSpacing}}/>
+            <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
-                    <Form.Control 
+                    <Form.Control
                         type="text"
-                        readOnly 
-                        style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+                        readOnly
+                        style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.controller}/>
                     <Form.Text className="text-muted">
                         Your DID controller account
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: config.formSpacing}}/>
+            <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document:</Form.Label>
-                    <TextArea 
+                    <TextArea
                         value={JSON.stringify(params.did.didDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
@@ -313,7 +246,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse, keyMaterial: DIDDoc
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: config.formSpacing}}/>
+            <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document Key:</Form.Label>
@@ -326,7 +259,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse, keyMaterial: DIDDoc
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: "2rem"}} />
+            <div style={{ paddingTop: "2rem" }} />
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button
@@ -341,7 +274,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse, keyMaterial: DIDDoc
                 </Form.Group>
             </Form.Row>
         </div>
-    )
-}
+    );
+};
 
 export default CreateDID;

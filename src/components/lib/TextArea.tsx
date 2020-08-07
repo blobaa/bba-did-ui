@@ -8,21 +8,21 @@ interface Props {
     readonly?: boolean;
     value?: string;
     defaultValue?: string;
-    height?: string
+    height?: string;
 }
 
 
 const TextArea: React.FC<Props> = (props) => {
 
-    const handleTextChange = (event: FormEvent<{value: string}>) => {
+    const handleTextChange = (event: FormEvent<{value: string}>): void => {
         if (props.onTextChange) {
             props.onTextChange(event.currentTarget.value);
         }
-    }
+    };
 
     return (
         <Form.Control
-            style={{textAlign: "start", maxHeight: props.height || "25rem", minHeight: props.height || "25rem", backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+            style={{ textAlign: "start", maxHeight: props.height || "25rem", minHeight: props.height || "25rem", backgroundColor: "rgba(4, 159, 173, 0.05)" }}
             as="textarea"
             defaultValue={props.defaultValue}
             placeholder={props.placeholder}
@@ -31,7 +31,7 @@ const TextArea: React.FC<Props> = (props) => {
             wrap="off"
             onChange={handleTextChange}/>
     );
-}
+};
 
 
 export default TextArea;

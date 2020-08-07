@@ -3,19 +3,19 @@ import { DIDDocumentObject, DIDDocKeyMaterial, DIDDocKey, DIDDocKeyType, DIDDocR
 
 export default class DDOT {
     public static create = async (
-                                    keyType: string, 
-                                    relationship: string, 
-                                    serviceName: string, 
-                                    serviceType: string, 
+                                    keyType: string,
+                                    relationship: string,
+                                    serviceName: string,
+                                    serviceType: string,
                                     serviceUrl: string
-                                ): Promise<{ ddot: DIDDocumentObject, keyMaterial: DIDDocKeyMaterial}> => {
+                                ): Promise<{ ddot: DIDDocumentObject; keyMaterial: DIDDocKeyMaterial}> => {
 
         let key = {} as DIDDocKey;
 
         if (keyType === "RSA") {
-            key = new DIDDocKey({keyType: DIDDocKeyType.RSA})
+            key = new DIDDocKey({ keyType: DIDDocKeyType.RSA });
         } else {
-            key = new DIDDocKey({keyType: DIDDocKeyType.Ed25519})
+            key = new DIDDocKey({ keyType: DIDDocKeyType.Ed25519 });
         }
 
         await key.generate();
@@ -26,26 +26,26 @@ export default class DDOT {
         let relationshipType = DIDDocRelationshipType.ASSERTION_METHOD;
 
         if (relationship === "Authentication") {
-            relationshipType = DIDDocRelationshipType.AUTHENTICATION
+            relationshipType = DIDDocRelationshipType.AUTHENTICATION;
         }
         if (relationship === "Assertion Method") {
-            relationshipType = DIDDocRelationshipType.ASSERTION_METHOD
+            relationshipType = DIDDocRelationshipType.ASSERTION_METHOD;
         }
         if (relationship === "Capability Delegation") {
-            relationshipType = DIDDocRelationshipType.CAPABILITY_DELEGATION
+            relationshipType = DIDDocRelationshipType.CAPABILITY_DELEGATION;
         }
         if (relationship === "Capability Invocation") {
-            relationshipType = DIDDocRelationshipType.CAPABILITY_INVOCATION
+            relationshipType = DIDDocRelationshipType.CAPABILITY_INVOCATION;
         }
         if (relationship === "Key Agreement") {
-            relationshipType = DIDDocRelationshipType.KEY_AGREEMENT
+            relationshipType = DIDDocRelationshipType.KEY_AGREEMENT;
         }
 
         if (relationship !== "None") {
             _relationship = new DIDDocRelationship({
-                relationshipType: relationshipType,
+                relationshipType,
                 publicKeys: [ publicKey ]
-            })
+            });
         }
 
 
@@ -66,7 +66,7 @@ export default class DDOT {
         });
 
 
-        return {ddot: document.publish(), keyMaterial: await key.exportKeyMaterial() };
+        return { ddot: document.publish(), keyMaterial: await key.exportKeyMaterial() };
     }
 
 }

@@ -2,7 +2,7 @@ import { account } from "@blobaa/ardor-ts";
 import { bbaMethodHandler, UpdateDIDControllerResponse } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
-import { Alert, Button, Col, Form } from "react-bootstrap";
+import { Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
@@ -12,24 +12,24 @@ import Success from "./lib/Success";
 
 const UpdateController: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
-    
 
-    const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
+
+    const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
         event.stopPropagation();
 
-
+        /*eslint-disable @typescript-eslint/no-explicit-any*/
         const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
         const currentPassphrase = (event.currentTarget.elements.namedItem("formCurrentPassphrase") as any).value as string;
         const newPassphrase = (event.currentTarget.elements.namedItem("formNewPassphrase") as any).value as string;
+        /*eslint-enable @typescript-eslint/no-explicit-any*/
 
-        
         if (config.isDev) {
             const devResp = {
                 did: config.devDid.did.did,
                 oldControllerAccount: config.devDid.account,
                 newControllerAccount: config.devDid.newAccount
-            }
+            };
             setResultFragment(updatedControllerFragment(devResp));
         } else {
             updateController(did, currentPassphrase, newPassphrase)
@@ -37,16 +37,16 @@ const UpdateController: React.FC = () => {
                 setResultFragment(updatedControllerFragment(resp));
             })
             .catch((error) => {
-                console.log(error)
+                console.log(error);
                 setResultFragment(<Error message={"Couldn't update DID Controller :("} />);
-            })
+            });
         }
-    }
+    };
 
-    
+
     return (
         <div>
-            <div style={{paddingTop: "1rem"}}/>
+            <div style={{ paddingTop: "1rem" }}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
@@ -57,7 +57,7 @@ const UpdateController: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formCurrentPassphrase">
                         <Form.Label>Current DID Controller Passphrase:</Form.Label>
@@ -67,7 +67,7 @@ const UpdateController: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formNewPassphrase">
                         <Form.Label>New DID Controller Passphrase:</Form.Label>
@@ -77,23 +77,23 @@ const UpdateController: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: "1rem"}}/>
-                <Button 
+                <div style={{ paddingTop: "1rem" }}/>
+                <Button
                     variant="outline-primary"
                     type="submit">
                     Update DID Controller
                 </Button>
             </Form>
-            <div style={{paddingTop: "3rem"}}/>
+            <div style={{ paddingTop: "3rem" }}/>
             {resultFragment}
         </div>
     );
-}
+};
 
 
-const updateController = async( 
-                        did: string, 
-                        currentPassphrase: string, 
+const updateController = async(
+                        did: string,
+                        currentPassphrase: string,
                         newPassphrase: string
                     ): Promise<UpdateDIDControllerResponse> => {
 
@@ -109,51 +109,51 @@ const updateController = async(
     await Funds.checkFunds(url, newAccountRs, minBalance);
 
     return bbaMethodHandler.updateDIDController(url, {
-        did: did,
+        did,
         passphrase: currentPassphrase,
-        newPassphrase: newPassphrase
+        newPassphrase
     });
-}
+};
 
 const updatedControllerFragment = (updateControllerResponse: UpdateDIDControllerResponse): React.ReactFragment => {
-    
-    const handleDownloadClicked = () => {
+
+    const handleDownloadClicked = (): void => {
         const didInfo = {
             did: updateControllerResponse.did,
             oldController: updateControllerResponse.oldControllerAccount,
             newController: updateControllerResponse.newControllerAccount,
             timestamp: Time.getUnixTime()
-        }
+        };
         fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".updatedController.json");
-    }
+    };
 
 
     return (
         <div>
             <Success message="DID Controller successfully updated :)"/>
-            <div style={{paddingTop: "1rem"}}/>
-            <p style={{fontSize: "1.8rem"}}>Results</p>
+            <div style={{ paddingTop: "1rem" }}/>
+            <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
-                    <Form.Control 
+                    <Form.Control
                         type="text"
-                        readOnly 
-                        style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+                        readOnly
+                        style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={updateControllerResponse.did}/>
                     <Form.Text className="text-muted">
                         Your decentralized identifier (DID)
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: config.formSpacing}}/>
+            <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="6">
                     <Form.Label>Old DID Controller:</Form.Label>
-                    <Form.Control 
+                    <Form.Control
                         type="text"
-                        readOnly 
-                        style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+                        readOnly
+                        style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={updateControllerResponse.oldControllerAccount}/>
                     <Form.Text className="text-muted">
                         Your old DID controller account
@@ -161,17 +161,17 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                 </Form.Group>
                 <Form.Group as={Col} sm="6">
                     <Form.Label>New DID Controller:</Form.Label>
-                    <Form.Control 
+                    <Form.Control
                         type="text"
-                        readOnly 
-                        style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+                        readOnly
+                        style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={updateControllerResponse.newControllerAccount}/>
                     <Form.Text className="text-muted">
                         Your new DID controller account
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: "2rem"}} />
+            <div style={{ paddingTop: "2rem" }} />
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button
@@ -185,7 +185,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                 </Form.Group>
             </Form.Row>
         </div>
-    )
-}
+    );
+};
 
 export default UpdateController;

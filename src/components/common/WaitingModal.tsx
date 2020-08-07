@@ -4,7 +4,7 @@ import { Modal, ProgressBar } from "react-bootstrap";
 interface Props {
     show: boolean;
     percentage: number;
-    title: string
+    title: string;
 }
 
 
@@ -23,6 +23,6 @@ const WaitingModal: React.FC<Props> = (props) => {
             </Modal.Body>
         </Modal>
     );
-}
+};
 
 export default WaitingModal;

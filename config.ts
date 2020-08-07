@@ -36,6 +36,6 @@ const config = {
         newAccount: "Bob",
     },
     formSpacing: "0.4rem"
-}
+};
 
 export default config;

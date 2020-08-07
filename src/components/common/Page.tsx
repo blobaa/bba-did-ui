@@ -1,7 +1,7 @@
 import Head from "next/head";
 import ServerUrl from "../../lib/ServerUrl";
-import "../../style/theme.scss"
-import "../../style/StyleSheet.css"
+import "../../style/theme.scss";
+import "../../style/StyleSheet.css";
 
 
 interface Props {
@@ -22,7 +22,7 @@ const Page: React.FC<Props> = (props) => {
             {props.children}
         </div>
     );
-}
+};
 
 
 export default Page;

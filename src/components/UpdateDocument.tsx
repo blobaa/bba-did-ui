@@ -1,27 +1,27 @@
 import { account } from "@blobaa/ardor-ts";
 import { bbaMethodHandler, UpdateDIDDocumentResponse } from "@blobaa/bba-did-method-handler-ts";
-import { DIDDocKey, DIDDocKeyMaterial, DIDDocKeyType, DIDDocRelationship, DIDDocRelationshipType, DIDDocService, DIDDocument, DIDDocumentObject } from "@blobaa/did-document-ts";
+import { DIDDocKeyMaterial } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
 import config from "../../config";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
+import DDOT from "./../lib/DDOT";
 import Error from "./lib/Error";
 import Success from "./lib/Success";
 import TextArea from "./lib/TextArea";
-import DDOT from "./../lib/DDOT";
 
 
 const UpdateDDOT: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
-    
 
-    const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
+
+    const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
         event.stopPropagation();
 
-
+        /*eslint-disable @typescript-eslint/no-explicit-any*/
         const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
         const passphrase = (event.currentTarget.elements.namedItem("formPassphrase") as any).value as string;
         const keyType = (event.currentTarget.elements.namedItem("formKeyType") as any).value as string;
@@ -29,7 +29,7 @@ const UpdateDDOT: React.FC = () => {
         const serviceName = (event.currentTarget.elements.namedItem("formServiceName") as any).value as string;
         const serviceType = (event.currentTarget.elements.namedItem("formServiceType") as any).value as string;
         const serviceUrl = (event.currentTarget.elements.namedItem("formServiceUrl") as any).value as string;
-
+        /*eslint-enable @typescript-eslint/no-explicit-any*/
 
         if (config.isDev) {
             const devResp = {
@@ -44,19 +44,19 @@ const UpdateDDOT: React.FC = () => {
         } else {
             updateDocument(did, keyType, relationship, serviceName, serviceType, serviceUrl, passphrase)
             .then((resp) => {
-                setResultFragment(updatedDocFragment(resp))
+                setResultFragment(updatedDocFragment(resp));
             })
             .catch((error) => {
-                console.log(error)
+                console.log(error);
                 setResultFragment(<Error message={"Couldn't update DID Document :("} />);
-            })
+            });
         }
-    }
+    };
 
-    
+
     return (
         <div>
-            <div style={{paddingTop: "1rem"}}/>
+            <div style={{ paddingTop: "1rem" }}/>
             <Form onSubmit={handleSubmitForm}>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
@@ -67,7 +67,7 @@ const UpdateDDOT: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
                         <Form.Label>DID Controller Passphrase:</Form.Label>
@@ -77,7 +77,7 @@ const UpdateDDOT: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Group>
                     <Form.Label>New DID Document Key</Form.Label>
                     <Form.Row>
@@ -107,7 +107,7 @@ const UpdateDDOT: React.FC = () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{paddingTop: config.formSpacing}}/>
+                <div style={{ paddingTop: config.formSpacing }}/>
                 <Form.Group>
                     <Form.Label>New DID Document Service</Form.Label>
                     <Form.Row>
@@ -134,29 +134,29 @@ const UpdateDDOT: React.FC = () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{paddingTop: "1rem"}}/>
-                <Button 
+                <div style={{ paddingTop: "1rem" }}/>
+                <Button
                     variant="outline-primary"
                     type="submit">
                     Update DID Document
                 </Button>
             </Form>
-            <div style={{paddingTop: "3rem"}}/>
+            <div style={{ paddingTop: "3rem" }}/>
             {resultFragment}
         </div>
     );
-}
+};
 
 
 const updateDocument = async(
                         did: string,
-                        keyType: string, 
-                        relationship: string, 
-                        serviceName: string, 
-                        serviceType: string, 
+                        keyType: string,
+                        relationship: string,
+                        serviceName: string,
+                        serviceType: string,
                         serviceUrl: string,
                         passphrase: string,
-                    ): Promise<{keyMaterial: DIDDocKeyMaterial, did: UpdateDIDDocumentResponse, controller: string}> => {
+                    ): Promise<{keyMaterial: DIDDocKeyMaterial; did: UpdateDIDDocumentResponse; controller: string}> => {
 
     const didElements = did.split(":");
     const isTestnet = didElements[2] === "t";
@@ -169,134 +169,67 @@ const updateDocument = async(
 
 
     const createDDOTReturn = await DDOT.create(keyType, relationship, serviceName, serviceType, serviceUrl);
-    // const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
     const updateDocumentResponse = await bbaMethodHandler.updateDIDDocument(url, {
-        did: did,
+        did,
         newDidDocumentTemplate: createDDOTReturn.ddot,
-        passphrase: passphrase,    
+        passphrase,
     });
-    
+
     return { keyMaterial:  createDDOTReturn.keyMaterial, did: updateDocumentResponse, controller: accountRs };
-}
-
-const createDDOT = async(
-                        keyType: string, 
-                        relationship: string, 
-                        serviceName: string, 
-                        serviceType: string, 
-                        serviceUrl: string
-                    ): Promise<{ ddot: DIDDocumentObject, keyMaterial: DIDDocKeyMaterial}> => {
-
-    let key = {} as DIDDocKey;
-
-    if (keyType === "RSA") {
-        key = new DIDDocKey({keyType: DIDDocKeyType.RSA})
-    } else {
-        key = new DIDDocKey({keyType: DIDDocKeyType.Ed25519})
-    }
-
-    await key.generate();
-    const publicKey = key.publish();
-    
-
-    let _relationship: undefined | DIDDocRelationship;
-    let relationshipType = DIDDocRelationshipType.ASSERTION_METHOD;
-
-    if (relationship === "Authentication") {
-        relationshipType = DIDDocRelationshipType.AUTHENTICATION
-    }
-    if (relationship === "Assertion Method") {
-        relationshipType = DIDDocRelationshipType.ASSERTION_METHOD
-    }
-    if (relationship === "Capability Delegation") {
-        relationshipType = DIDDocRelationshipType.CAPABILITY_DELEGATION
-    }
-    if (relationship === "Capability Invocation") {
-        relationshipType = DIDDocRelationshipType.CAPABILITY_INVOCATION
-    }
-    if (relationship === "Key Agreement") {
-        relationshipType = DIDDocRelationshipType.KEY_AGREEMENT
-    }
-
-    if (relationship !== "None") {
-        _relationship = new DIDDocRelationship({
-            relationshipType: relationshipType,
-            publicKeys: [ publicKey ]
-        })
-    }
+};
 
 
-    let service: undefined | DIDDocService;
-    if (serviceName && serviceType && serviceUrl) {
-        service = new DIDDocService({
-            name: serviceName,
-            type: serviceType,
-            serviceEndpoint: serviceUrl
-        });
-    }
+const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse; keyMaterial: DIDDocKeyMaterial; controller: string}): React.ReactFragment => {
 
-
-    const document = new DIDDocument({
-        publicKeys: _relationship ? undefined : [ publicKey ],
-        relationships: _relationship ? [ _relationship ] : undefined,
-        services: service ? [ service ] : undefined,
-    });
-
-
-    return {ddot: document.publish(), keyMaterial: await key.exportKeyMaterial()}
-}
-
-const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse, keyMaterial: DIDDocKeyMaterial, controller: string}): React.ReactFragment => {
-    
-    const handleDownloadClicked = () => {
+    const handleDownloadClicked = (): void => {
         const didInfo = {
             did: params.did.did,
             didDoc: params.did.newDidDocument,
             key: params.keyMaterial,
             controller: params.controller,
             timestamp: Time.getUnixTime()
-        }
+        };
         fileDownload(JSON.stringify(didInfo, undefined, 2), didInfo.did + ".updatedDoc.json");
-    }
+    };
 
 
     return (
         <div>
             <Success message="DID Document successfully updated :)"/>
-            <div style={{paddingTop: "1rem"}}/>
-            <p style={{fontSize: "1.8rem"}}>Results</p>
+            <div style={{ paddingTop: "1rem" }}/>
+            <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID:</Form.Label>
-                    <Form.Control 
+                    <Form.Control
                         type="text"
-                        readOnly 
-                        style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+                        readOnly
+                        style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.did.did}/>
                     <Form.Text className="text-muted">
                         Your decentralized identifier (DID)
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: config.formSpacing}}/>
+            <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
-                    <Form.Control 
+                    <Form.Control
                         type="text"
-                        readOnly 
-                        style={{backgroundColor: "rgba(4, 159, 173, 0.05)"}}
+                        readOnly
+                        style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.controller}/>
                     <Form.Text className="text-muted">
                         Your DID controller account
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: config.formSpacing}}/>
+            <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>New DID Document:</Form.Label>
-                    <TextArea 
+                    <TextArea
                         value={JSON.stringify(params.did.newDidDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
@@ -304,7 +237,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse, keyMaterial
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: config.formSpacing}}/>
+            <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document Key:</Form.Label>
@@ -317,7 +250,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse, keyMaterial
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{paddingTop: "2rem"}} />
+            <div style={{ paddingTop: "2rem" }} />
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Button
@@ -332,7 +265,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse, keyMaterial
                 </Form.Group>
             </Form.Row>
         </div>
-    )
-}
+    );
+};
 
 export default UpdateDDOT;
