@@ -8,8 +8,6 @@ import UpdateController from '../components/UpdateController';
 import UpdateDDOT from '../components/UpdateDocument';
 
 
-const formSpacing = "0.4rem";
-
 
 const DemoHome: React.FC = () => {
     return (

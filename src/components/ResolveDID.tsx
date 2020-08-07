@@ -1,4 +1,4 @@
-import { bbaMethodHandler, ResolveDIDResponse } from "@blobaa/bba-did-method-handler-ts";
+import { bbaMethodHandler, ResolveDIDResponse, Error as _Error } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
@@ -32,9 +32,11 @@ const ResolveDID: React.FC = () => {
             .then((resp) => {
                 setResultFragment(resolvedDIDFragment(resp));
             })
-            .catch((error) => {
-                console.log(error);
-                setResultFragment(<Error message={"Couldn't resolve DID :("} />);
+            .catch((e) => {
+                console.log(e);
+                const error = e as _Error;
+                const title = "Couldn't resolve DID :(";
+                setResultFragment(<Error title={title} message={error.description} />);
             });
         }
     };
@@ -82,7 +84,7 @@ const resolvedDIDFragment = (params: ResolveDIDResponse): React.ReactFragment =>
 
     return (
         <div>
-            <Success message="DID successfully resolved :)"/>
+            <Success title="DID successfully resolved :)"/>
             <div style={{ paddingTop: "1rem" }}/>
             <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>

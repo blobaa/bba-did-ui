@@ -1,5 +1,5 @@
 import { account } from "@blobaa/ardor-ts";
-import { bbaMethodHandler, UpdateDIDControllerResponse } from "@blobaa/bba-did-method-handler-ts";
+import { bbaMethodHandler, UpdateDIDControllerResponse, Error as _Error } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
@@ -36,9 +36,11 @@ const UpdateController: React.FC = () => {
             .then((resp) => {
                 setResultFragment(updatedControllerFragment(resp));
             })
-            .catch((error) => {
-                console.log(error);
-                setResultFragment(<Error message={"Couldn't update DID Controller :("} />);
+            .catch((e) => {
+                console.log(e);
+                const error = e as _Error;
+                const title = "Couldn't update DID Controller :(";
+                setResultFragment(<Error title={title} message={error.description} />);
             });
         }
     };
@@ -130,7 +132,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
 
     return (
         <div>
-            <Success message="DID Controller successfully updated :)"/>
+            <Success title="DID Controller successfully updated :)"/>
             <div style={{ paddingTop: "1rem" }}/>
             <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>

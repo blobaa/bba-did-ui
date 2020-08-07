@@ -1,5 +1,5 @@
 import { account } from "@blobaa/ardor-ts";
-import { bbaMethodHandler, CreateDIDResponse } from "@blobaa/bba-did-method-handler-ts";
+import { bbaMethodHandler, CreateDIDResponse, Error as _Error } from "@blobaa/bba-did-method-handler-ts";
 import { DIDDocKeyMaterial } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
@@ -48,9 +48,11 @@ const CreateDID: React.FC= () => {
             .then((resp) => {
                 setResultFragment(createdDIDFragment(resp));
             })
-            .catch((error) => {
-                console.log(error);
-                setResultFragment(<Error message={"Couldn't create DID :("} />);
+            .catch((e) => {
+                console.log(e);
+                const error = e as _Error;
+                const title = "Couldn't create DID :(";
+                setResultFragment(<Error title={title} message={error.description} />);
             });
         }
     };
@@ -178,7 +180,6 @@ const createDID = async(
 
 
     const createDDOTReturn = await DDOT.create(keyType, relationship, serviceName, serviceType, serviceUrl);
-    // const createDDOTReturn = await createDDOT(keyType, relationship, serviceName, serviceType, serviceUrl);
     const createDIDResponse = await bbaMethodHandler.createDID(url, {
         didDocumentTemplate: createDDOTReturn.ddot,
         passphrase,
@@ -204,7 +205,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
 
     return (
         <div>
-            <Success message="DID successfully created :)"/>
+            <Success title="DID successfully created :)"/>
             <div style={{ paddingTop: "1rem" }}/>
             <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>

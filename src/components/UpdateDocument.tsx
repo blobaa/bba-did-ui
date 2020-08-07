@@ -1,5 +1,5 @@
 import { account } from "@blobaa/ardor-ts";
-import { bbaMethodHandler, UpdateDIDDocumentResponse } from "@blobaa/bba-did-method-handler-ts";
+import { bbaMethodHandler, Error as _Error, UpdateDIDDocumentResponse } from "@blobaa/bba-did-method-handler-ts";
 import { DIDDocKeyMaterial } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
@@ -46,9 +46,11 @@ const UpdateDDOT: React.FC = () => {
             .then((resp) => {
                 setResultFragment(updatedDocFragment(resp));
             })
-            .catch((error) => {
-                console.log(error);
-                setResultFragment(<Error message={"Couldn't update DID Document :("} />);
+            .catch((e) => {
+                console.log(e);
+                const error = e as _Error;
+                const title = "Couldn't update DID Document :(";
+                setResultFragment(<Error title={title} message={error.description} />);
             });
         }
     };
@@ -195,7 +197,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse; keyMaterial
 
     return (
         <div>
-            <Success message="DID Document successfully updated :)"/>
+            <Success title="DID Document successfully updated :)"/>
             <div style={{ paddingTop: "1rem" }}/>
             <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>

@@ -1,5 +1,5 @@
 import { account } from "@blobaa/ardor-ts";
-import { bbaMethodHandler } from "@blobaa/bba-did-method-handler-ts";
+import { bbaMethodHandler, Error as _Error } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
@@ -34,9 +34,11 @@ const DeactivateDID: React.FC = () => {
             .then((resp) => {
                 setResultFragment(deactivatedDIDFragment(resp));
             })
-            .catch((error) => {
-                console.log(error);
-                setResultFragment(<Error message={"Couldn't deactivate DID :("} />);
+            .catch((e) => {
+                console.log(e);
+                const error = e as _Error;
+                const title = "Couldn't deactivate DID :(";
+                setResultFragment(<Error title={title} message={error.description} />);
             });
         }
     };
@@ -112,7 +114,7 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string; controller: s
 
     return (
         <div>
-            <Success message="DID successfully deactivated :)"/>
+            <Success title="DID successfully deactivated :)"/>
             <div style={{ paddingTop: "1rem" }}/>
             <p style={{ fontSize: "1.8rem" }}>Results</p>
            <Form.Row>
