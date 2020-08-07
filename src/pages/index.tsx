@@ -25,7 +25,7 @@ const DemoHome: React.FC = () => {
                 <Tabs defaultActiveKey="create"  id="noanim-tab-example">
                     <Tab eventKey="create" title="Create DID">
                         <div style={{ paddingTop: "1rem" }}/>
-                        <CreateDID formSpacing={formSpacing}/>
+                        <CreateDID/>
                     </Tab>
                     <Tab eventKey="resolve" title="Resolve DID">
                         <div style={{ paddingTop: "1rem" }}/>
@@ -33,15 +33,15 @@ const DemoHome: React.FC = () => {
                     </Tab>
                     <Tab eventKey="updateDDOT" title="Update DID Document">
                         <div style={{ paddingTop: "1rem" }}/>
-                        <UpdateDDOT formSpacing={formSpacing}/>
+                        <UpdateDDOT/>
                     </Tab>
                     <Tab eventKey="updateController" title="Update DID Controller">
                         <div style={{ paddingTop: "1rem" }}/>
-                        <UpdateController formSpacing={formSpacing}/>
+                        <UpdateController/>
                     </Tab>
                     <Tab eventKey="deactivate" title="Deactivate DID">
                         <div style={{ paddingTop: "1rem" }}/>
-                        <DeactivateDID formSpacing={formSpacing}/>
+                        <DeactivateDID/>
                     </Tab>
                 </Tabs>
             </Layout>
