@@ -257,8 +257,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse; keyMaterial
                 <Form.Group as={Col} sm="12">
                     <Button
                         onClick={handleDownloadClicked}
-                        variant="outline-primary"
-                        size="lg">
+                        variant="outline-primary">
                         Save Updated DID
                     </Button>
                     <Form.Text className="text-muted">

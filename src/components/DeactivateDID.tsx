@@ -133,7 +133,7 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string; controller: s
             <div style={{ paddingTop: config.formSpacing }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
-                    <Form.Label>DID Controller:</Form.Label>
+                    <Form.Label>Last DID Controller:</Form.Label>
                     <Form.Control
                         type="text"
                         readOnly

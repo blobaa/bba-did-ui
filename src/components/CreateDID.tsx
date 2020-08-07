@@ -265,8 +265,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                 <Form.Group as={Col} sm="12">
                     <Button
                         onClick={handleDownloadClicked}
-                        variant="outline-primary"
-                        size="lg">
+                        variant="outline-primary">
                         Save Created DID
                     </Button>
                     <Form.Text className="text-muted">
