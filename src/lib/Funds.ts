@@ -1,5 +1,5 @@
 import { ChainId, chainCurrency, ChainCurrencyType } from "@blobaa/ardor-ts";
-import MyRequest from "./myRequest";
+import MyRequest from "./MyRequest";
 
 export default class Funds {
     public static async checkFunds(url: string, accountRs: string, minBalance: number): Promise<void> {

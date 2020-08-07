@@ -1,5 +1,5 @@
 const config = {
-    isDev: true,
+    isDev: false,
     url: {
         testnet: "https://testardor.jelurida.com",
         mainnet: "https://ardor.jelurida.com"
