@@ -47,8 +47,8 @@ GH_PAGES_FOLDER_PATH="$(pwd)/${GH_PAGES_FOLDER}"
 ###################################################################################################
 
 echo "[INFO] prepare project..."
-# mv ../.env ../.env-orig
-# mv ../.env-production ../.env
+mv ../.env ../.env-orig
+mv ../.env-production ../.env
 
 
 echo "[INFO] building static project..."
@@ -102,8 +102,8 @@ git push
 echo "" && echo "[INFO] cleaning up..."
 cd ..
 rm -rf ${DEPLOY_REPO_NAME}
-# mv ../.env ../.env-production
-# mv ../.env-orig ../.env
+mv ../.env ../.env-production
+mv ../.env-orig ../.env
 
 
 echo "" && echo "[INFO] done."
