@@ -12,11 +12,12 @@ const DemoHome: React.FC = () => {
     return (
         <Page>
             <Layout>
-                <h2 style={{ textAlign: "center" }}>BBA DID Method</h2>
+                <h2 style={{ textAlign: "center" }}><b style={{ color:"#04A0AD" }}>W</b>eb <b style={{ color:"#04A0AD" }}>U</b>I for <b style={{ color:"#04A0AD" }}>B</b>BA <b style={{ color:"#04A0AD" }}>C</b>RUD <b style={{ color:"#04A0AD" }}>O</b>perations</h2>
                 <div style={{ paddingTop: "1rem" }}/>
                 <Row>
                     <div style={{ textAlign: "center", margin: "auto", paddingBottom: "1rem", color: "#666", fontSize: "large" }}>
-                        This is the BBA DID Method UI
+                        <p>Welcome to the Web UI for handling the <a href="https://github.com/blobaa/bba-did-method-specification">bba DID method</a>.</p>
+                        <p>It wraps the <a href="https://github.com/blobaa/bba-did-method-handler-ts">reference implementation</a> into a user interface to give easy and convenient access to the bba DID method </p>
                     </div>
                 </Row>
                 <Tabs defaultActiveKey="create"  id="noanim-tab-example">
