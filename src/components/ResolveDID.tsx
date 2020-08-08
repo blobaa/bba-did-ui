@@ -1,8 +1,10 @@
-import { bbaMethodHandler, ResolveDIDResponse, Error as _Error } from "@blobaa/bba-did-method-handler-ts";
+import { bbaMethodHandler, Error as _Error, ResolveDIDResponse } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
-import config from "../../config";
+import { FORM_SPACING } from "../constants";
+import dev from "../dev";
+import DotEnv from "../lib/DotEnv";
 import Time from "./../lib/Time";
 import Error from "./lib/Error";
 import Success from "./lib/Success";
@@ -23,15 +25,15 @@ const ResolveDID: React.FC = () => {
         const did = (event.currentTarget.elements.namedItem("formDid") as any).value as string;
         /*eslint-enable @typescript-eslint/no-explicit-any*/
 
-        if (config.isDev) {
+        if (DotEnv.isDev) {
             const devResp = {
-                did: config.devDid.did.did,
-                didDocument: config.devDid.did.didDocument
+                did: dev.devDid.did.did,
+                didDocument: dev.devDid.did.didDocument
             };
             setTimeout(() => {
                 setResultFragment(resolvedDIDFragment(devResp));
                 setIsLoading(false);
-            }, config.devProcessMsec);
+            }, dev.processMsec);
         } else {
             resolveDID(did)
             .then((resp) => {
@@ -77,7 +79,7 @@ const ResolveDID: React.FC = () => {
 
 const resolveDID = async( did: string): Promise<ResolveDIDResponse> => {
     const didElements = did.split(":");
-    const url = didElements[2] === "t" ? config.url.testnet : config.url.mainnet;
+    const url = didElements[2] === "t" ? DotEnv.testnetUrl : DotEnv.mainnetUrl;
     return bbaMethodHandler.resolveDID(url, { did });
 };
 
@@ -107,7 +109,7 @@ const resolvedDIDFragment = (params: ResolveDIDResponse): React.ReactFragment =>
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document:</Form.Label>

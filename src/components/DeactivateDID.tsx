@@ -3,7 +3,9 @@ import { bbaMethodHandler, Error as _Error } from "@blobaa/bba-did-method-handle
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
-import config from "../../config";
+import { FORM_SPACING } from "../constants";
+import dev from "../dev";
+import DotEnv from "../lib/DotEnv";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
 import Error from "./lib/Error";
@@ -25,15 +27,15 @@ const DeactivateDID: React.FC = () => {
         const passphrase = (event.currentTarget.elements.namedItem("formPassphrase") as any).value as string;
         /*eslint-enable @typescript-eslint/no-explicit-any*/
 
-        if (config.isDev) {
+        if (DotEnv.isDev) {
             const devResp = {
-                deactivatedDid: config.devDid.did.did,
-                controller: config.devDid.account
+                deactivatedDid: dev.devDid.did.did,
+                controller: dev.devDid.account
             };
             setTimeout(() => {
                 setResultFragment(deactivatedDIDFragment(devResp));
                 setIsLoading(false);
-            }, config.devProcessMsec);
+            }, dev.processMsec);
         } else {
             deactivateDID(did, passphrase)
             .then((resp) => {
@@ -65,7 +67,7 @@ const DeactivateDID: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
                         <Form.Label>DID Controller Passphrase:</Form.Label>
@@ -94,9 +96,9 @@ const deactivateDID = async(did: string, passphrase: string): Promise<{deactivat
     const didElements = did.split(":");
     const isTestnet = didElements[2] === "t";
 
-    const url = isTestnet ? config.url.testnet : config.url.mainnet;
+    const url = isTestnet ? DotEnv.testnetUrl : DotEnv.mainnetUrl;
     const accountRs = account.convertPassphraseToAccountRs(passphrase);
-    const minBalance = isTestnet ? config.minIgnisBalance.testnet : config.minIgnisBalance.mainnet;
+    const minBalance = isTestnet ? DotEnv.minTestnetBalance : DotEnv.minMainnetBalance;
 
     await Funds.checkFunds(url, accountRs, minBalance);
 
@@ -138,7 +140,7 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string; controller: s
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>Last DID Controller:</Form.Label>

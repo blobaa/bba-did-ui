@@ -4,8 +4,10 @@ import { DIDDocKeyMaterial } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
-import config from "../../config";
+import { FORM_SPACING } from "../constants";
+import dev from "../dev";
 import DDOT from "../lib/DDOT";
+import DotEnv from "../lib/DotEnv";
 import Funds from "../lib/Funds";
 import Time from "./../lib/Time";
 import Error from "./lib/Error";
@@ -38,16 +40,16 @@ const CreateDID: React.FC= () => {
         const serviceUrl = (event.currentTarget.elements.namedItem("formServiceUrl") as any).value as string;
         /*eslint-enable @typescript-eslint/no-explicit-any*/
 
-        if (config.isDev) {
+        if (DotEnv.isDev) {
             const devResp = {
-                did: config.devDid.did,
-                keyMaterial: config.devDid.keyMaterial,
-                controller: config.devDid.account
+                did: dev.devDid.did,
+                keyMaterial: dev.devDid.keyMaterial,
+                controller: dev.devDid.account
             };
             setTimeout(() => {
                 setResultFragment(createdDIDFragment(devResp));
                 setIsLoading(false);
-            }, config.devProcessMsec);
+            }, dev.processMsec);
         } else {
             createDID(keyType, relationship, serviceName, serviceType, serviceUrl, passphrase, isTestnet)
             .then((resp) => {
@@ -79,7 +81,7 @@ const CreateDID: React.FC= () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Row>
                     <Form.Group controlId="formNetwork">
                         <Form.Label>Network:</Form.Label>
@@ -99,7 +101,7 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Group>
                 </Form.Row>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Group>
                     <Form.Label>DID Document Key</Form.Label>
                     <Form.Row>
@@ -129,7 +131,7 @@ const CreateDID: React.FC= () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Group>
                     <Form.Label>DID Document Service</Form.Label>
                     <Form.Row>
@@ -180,9 +182,9 @@ const createDID = async(
                         isTestnet: boolean
                     ): Promise<{keyMaterial: DIDDocKeyMaterial; did: CreateDIDResponse; controller: string}> => {
 
-    const url = isTestnet ? config.url.testnet : config.url.mainnet;
+    const url = isTestnet ? DotEnv.testnetUrl : DotEnv.mainnetUrl;
     const accountRs = account.convertPassphraseToAccountRs(passphrase);
-    const minBalance = isTestnet ? config.minIgnisBalance.testnet : config.minIgnisBalance.mainnet;
+    const minBalance = isTestnet ? DotEnv.minTestnetBalance : DotEnv.minMainnetBalance;
 
     await Funds.checkFunds(url, accountRs, minBalance);
 
@@ -229,7 +231,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
@@ -243,7 +245,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document:</Form.Label>
@@ -255,7 +257,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document Key:</Form.Label>

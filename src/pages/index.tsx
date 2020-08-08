@@ -8,7 +8,6 @@ import UpdateController from '../components/UpdateController';
 import UpdateDDOT from '../components/UpdateDocument';
 
 
-
 const DemoHome: React.FC = () => {
     return (
         <Page>

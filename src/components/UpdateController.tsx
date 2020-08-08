@@ -1,9 +1,11 @@
 import { account } from "@blobaa/ardor-ts";
-import { bbaMethodHandler, UpdateDIDControllerResponse, Error as _Error } from "@blobaa/bba-did-method-handler-ts";
+import { bbaMethodHandler, Error as _Error, UpdateDIDControllerResponse } from "@blobaa/bba-did-method-handler-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
-import config from "../../config";
+import { FORM_SPACING } from "../constants";
+import dev from "../dev";
+import DotEnv from "../lib/DotEnv";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
 import Error from "./lib/Error";
@@ -26,16 +28,16 @@ const UpdateController: React.FC = () => {
         const newPassphrase = (event.currentTarget.elements.namedItem("formNewPassphrase") as any).value as string;
         /*eslint-enable @typescript-eslint/no-explicit-any*/
 
-        if (config.isDev) {
+        if (DotEnv.isDev) {
             const devResp = {
-                did: config.devDid.did.did,
-                oldControllerAccount: config.devDid.account,
-                newControllerAccount: config.devDid.newAccount
+                did: dev.devDid.did.did,
+                oldControllerAccount: dev.devDid.account,
+                newControllerAccount: dev.devDid.newAccount
             };
             setTimeout(() => {
                 setResultFragment(updatedControllerFragment(devResp));
                 setIsLoading(false);
-            }, config.devProcessMsec);
+            }, dev.processMsec);
         } else {
             updateController(did, currentPassphrase, newPassphrase)
             .then((resp) => {
@@ -67,7 +69,7 @@ const UpdateController: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formCurrentPassphrase">
                         <Form.Label>Current DID Controller Passphrase:</Form.Label>
@@ -77,7 +79,7 @@ const UpdateController: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formNewPassphrase">
                         <Form.Label>New DID Controller Passphrase:</Form.Label>
@@ -110,10 +112,10 @@ const updateController = async(
     const didElements = did.split(":");
     const isTestnet = didElements[2] === "t";
 
-    const url = isTestnet ? config.url.testnet : config.url.mainnet;
+    const url = isTestnet ? DotEnv.testnetUrl : DotEnv.mainnetUrl;
     const currentAccountRs = account.convertPassphraseToAccountRs(currentPassphrase);
     const newAccountRs = account.convertPassphraseToAccountRs(newPassphrase);
-    const minBalance = isTestnet ? config.minIgnisBalance.testnet : config.minIgnisBalance.mainnet;
+    const minBalance = isTestnet ? DotEnv.minTestnetBalance : DotEnv.minMainnetBalance;
 
     await Funds.checkFunds(url, currentAccountRs, minBalance);
     await Funds.checkFunds(url, newAccountRs, minBalance);
@@ -156,7 +158,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="6">
                     <Form.Label>Old DID Controller:</Form.Label>

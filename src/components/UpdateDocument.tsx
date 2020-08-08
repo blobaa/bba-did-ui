@@ -4,7 +4,9 @@ import { DIDDocKeyMaterial } from "@blobaa/did-document-ts";
 import fileDownload from "js-file-download";
 import { FormEvent, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
-import config from "../../config";
+import { FORM_SPACING } from "../constants";
+import dev from "../dev";
+import DotEnv from "../lib/DotEnv";
 import Funds from "../lib/Funds";
 import Time from "../lib/Time";
 import DDOT from "./../lib/DDOT";
@@ -33,19 +35,19 @@ const UpdateDDOT: React.FC = () => {
         const serviceUrl = (event.currentTarget.elements.namedItem("formServiceUrl") as any).value as string;
         /*eslint-enable @typescript-eslint/no-explicit-any*/
 
-        if (config.isDev) {
+        if (DotEnv.isDev) {
             const devResp = {
                 did: {
-                    did: config.devDid.did.did,
-                    newDidDocument: config.devDid.did.didDocument
+                    did: dev.devDid.did.did,
+                    newDidDocument: dev.devDid.did.didDocument
                 },
-                controller: config.devDid.account,
-                keyMaterial: config.devDid.keyMaterial
+                controller: dev.devDid.account,
+                keyMaterial: dev.devDid.keyMaterial
             };
             setTimeout(() => {
                 setResultFragment(updatedDocFragment(devResp));
                 setIsLoading(false);
-            }, config.devProcessMsec);
+            }, dev.processMsec);
         } else {
             updateDocument(did, keyType, relationship, serviceName, serviceType, serviceUrl, passphrase)
             .then((resp) => {
@@ -77,7 +79,7 @@ const UpdateDDOT: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formPassphrase">
                         <Form.Label>DID Controller Passphrase:</Form.Label>
@@ -87,7 +89,7 @@ const UpdateDDOT: React.FC = () => {
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Group>
                     <Form.Label>New DID Document Key</Form.Label>
                     <Form.Row>
@@ -117,7 +119,7 @@ const UpdateDDOT: React.FC = () => {
                         </Form.Group>
                     </Form.Row>
                 </Form.Group>
-                <div style={{ paddingTop: config.formSpacing }}/>
+                <div style={{ paddingTop: FORM_SPACING }}/>
                 <Form.Group>
                     <Form.Label>New DID Document Service</Form.Label>
                     <Form.Row>
@@ -171,9 +173,9 @@ const updateDocument = async(
     const didElements = did.split(":");
     const isTestnet = didElements[2] === "t";
 
-    const url = isTestnet ? config.url.testnet : config.url.mainnet;
+    const url = isTestnet ? DotEnv.testnetUrl : DotEnv.mainnetUrl;
     const accountRs = account.convertPassphraseToAccountRs(passphrase);
-    const minBalance = isTestnet ? config.minIgnisBalance.testnet : config.minIgnisBalance.mainnet;
+    const minBalance = isTestnet ? DotEnv.minTestnetBalance : DotEnv.minMainnetBalance;
 
     await Funds.checkFunds(url, accountRs, minBalance);
 
@@ -221,7 +223,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse; keyMaterial
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="8">
                     <Form.Label>DID Controller:</Form.Label>
@@ -235,7 +237,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse; keyMaterial
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>New DID Document:</Form.Label>
@@ -247,7 +249,7 @@ const updatedDocFragment = (params: {did: UpdateDIDDocumentResponse; keyMaterial
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
-            <div style={{ paddingTop: config.formSpacing }}/>
+            <div style={{ paddingTop: FORM_SPACING }}/>
             <Form.Row>
                 <Form.Group as={Col} sm="12">
                     <Form.Label>DID Document Key:</Form.Label>

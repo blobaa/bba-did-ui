@@ -1,13 +1,4 @@
-const config = {
-    isDev: true,
-    url: {
-        testnet: "https://testardor.jelurida.com",
-        mainnet: "https://ardor.jelurida.com"
-    },
-    minIgnisBalance: {
-        testnet: 10,
-        mainnet: 2
-    },
+const dev = {
     devDid: {
         did: {
             did: "did:bba:t:f4abd8c31f9c9d5ccef04122f0374d2164956adb912f2ac8dda282401877d6c6",
@@ -35,8 +26,7 @@ const config = {
         account: "Alice",
         newAccount: "Bob",
     },
-    formSpacing: "0.4rem",
-    devProcessMsec: 2000
+    processMsec: 2000
 };
 
-export default config;
+export default dev;
