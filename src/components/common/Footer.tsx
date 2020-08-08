@@ -13,12 +13,7 @@ const Footer: React.FC = () => {
                     <Col lg="1"/>
                     <Col>
                         <p style={{ fontSize: "small", textAlign: "center" }}>
-                            <a href="https://github.com/atz3n/"><Image src={ServerUrl.get("/assets/common/github.png")} height="40rem"/></a>
-                        </p>
-                    </Col>
-                    <Col>
-                        <p style={{ fontSize: "small", textAlign: "center" }}>
-                            translation provided by <a href="https://www.deepl.com/home"><Image src={ServerUrl.get("/assets/common/deepl-logo.svg")} height="30rem"/></a>
+                            <a href="https://github.com/blobaa/"><Image src={ServerUrl.get("/assets/common/github.png")} height="40rem"/></a>
                         </p>
                     </Col>
                      <Col>
