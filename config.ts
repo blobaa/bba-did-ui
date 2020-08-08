@@ -1,5 +1,5 @@
 const config = {
-    isDev: false,
+    isDev: true,
     url: {
         testnet: "https://testardor.jelurida.com",
         mainnet: "https://ardor.jelurida.com"
@@ -35,7 +35,8 @@ const config = {
         account: "Alice",
         newAccount: "Bob",
     },
-    formSpacing: "0.4rem"
+    formSpacing: "0.4rem",
+    devProcessMsec: 2000
 };
 
 export default config;

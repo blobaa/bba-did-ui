@@ -11,9 +11,11 @@ import TextArea from "./lib/TextArea";
 
 const ResolveDID: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
+    const [ isLoading, setIsLoading ] = useState(false);
 
 
     const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
+        setIsLoading(true);
         event.preventDefault();
         event.stopPropagation();
 
@@ -26,7 +28,10 @@ const ResolveDID: React.FC = () => {
                 did: config.devDid.did.did,
                 didDocument: config.devDid.did.didDocument
             };
-            setResultFragment(resolvedDIDFragment(devResp));
+            setTimeout(() => {
+                setResultFragment(resolvedDIDFragment(devResp));
+                setIsLoading(false);
+            }, config.devProcessMsec);
         } else {
             resolveDID(did)
             .then((resp) => {
@@ -37,6 +42,8 @@ const ResolveDID: React.FC = () => {
                 const error = e as _Error;
                 const title = "Couldn't resolve DID :(";
                 setResultFragment(<Error title={title} message={error.description} />);
+            }).finally(() => {
+                setIsLoading(false);
             });
         }
     };
@@ -59,7 +66,7 @@ const ResolveDID: React.FC = () => {
                 <Button
                     variant="outline-primary"
                     type="submit">
-                    Resolve DID
+                    {isLoading ? "Resolving..." : "Resolve DID"}
                 </Button>
             </Form>
             <div style={{ paddingTop: "3rem" }}/>

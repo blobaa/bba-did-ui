@@ -16,6 +16,7 @@ import TextArea from "./lib/TextArea";
 const CreateDID: React.FC= () => {
     const [ isTestnet, setIsTestnet ] = useState(true);
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
+    const [ isLoading, setIsLoading ] = useState(false);
 
 
     const handleNetwork = (): void => {
@@ -24,6 +25,7 @@ const CreateDID: React.FC= () => {
 
 
     const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
+        setIsLoading(true);
         event.preventDefault();
         event.stopPropagation();
 
@@ -42,7 +44,10 @@ const CreateDID: React.FC= () => {
                 keyMaterial: config.devDid.keyMaterial,
                 controller: config.devDid.account
             };
-            setResultFragment(createdDIDFragment(devResp));
+            setTimeout(() => {
+                setResultFragment(createdDIDFragment(devResp));
+                setIsLoading(false);
+            }, config.devProcessMsec);
         } else {
             createDID(keyType, relationship, serviceName, serviceType, serviceUrl, passphrase, isTestnet)
             .then((resp) => {
@@ -53,6 +58,9 @@ const CreateDID: React.FC= () => {
                 const error = e as _Error;
                 const title = "Couldn't create DID :(";
                 setResultFragment(<Error title={title} message={error.description} />);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
         }
     };
@@ -152,7 +160,7 @@ const CreateDID: React.FC= () => {
                 <Button
                     variant="outline-primary"
                     type="submit">
-                    Create DID
+                    {isLoading ? "Creating..." : "Create DID"}
                 </Button>
             </Form>
             <div style={{ paddingTop: "3rem" }}/>

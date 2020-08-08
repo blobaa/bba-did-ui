@@ -12,9 +12,11 @@ import Success from "./lib/Success";
 
 const UpdateController: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
+    const [ isLoading, setIsLoading ] = useState(false);
 
 
     const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
+        setIsLoading(true);
         event.preventDefault();
         event.stopPropagation();
 
@@ -30,7 +32,10 @@ const UpdateController: React.FC = () => {
                 oldControllerAccount: config.devDid.account,
                 newControllerAccount: config.devDid.newAccount
             };
-            setResultFragment(updatedControllerFragment(devResp));
+            setTimeout(() => {
+                setResultFragment(updatedControllerFragment(devResp));
+                setIsLoading(false);
+            }, config.devProcessMsec);
         } else {
             updateController(did, currentPassphrase, newPassphrase)
             .then((resp) => {
@@ -41,6 +46,9 @@ const UpdateController: React.FC = () => {
                 const error = e as _Error;
                 const title = "Couldn't update DID Controller :(";
                 setResultFragment(<Error title={title} message={error.description} />);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
         }
     };
@@ -83,7 +91,7 @@ const UpdateController: React.FC = () => {
                 <Button
                     variant="outline-primary"
                     type="submit">
-                    Update DID Controller
+                    {isLoading ? "Updating Controller..." : "Update DID Controller"}
                 </Button>
             </Form>
             <div style={{ paddingTop: "3rem" }}/>

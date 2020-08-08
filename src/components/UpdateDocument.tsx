@@ -15,9 +15,11 @@ import TextArea from "./lib/TextArea";
 
 const UpdateDDOT: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
+    const [ isLoading, setIsLoading ] = useState(false);
 
 
     const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
+        setIsLoading(true);
         event.preventDefault();
         event.stopPropagation();
 
@@ -40,7 +42,10 @@ const UpdateDDOT: React.FC = () => {
                 controller: config.devDid.account,
                 keyMaterial: config.devDid.keyMaterial
             };
-            setResultFragment(updatedDocFragment(devResp));
+            setTimeout(() => {
+                setResultFragment(updatedDocFragment(devResp));
+                setIsLoading(false);
+            }, config.devProcessMsec);
         } else {
             updateDocument(did, keyType, relationship, serviceName, serviceType, serviceUrl, passphrase)
             .then((resp) => {
@@ -51,6 +56,9 @@ const UpdateDDOT: React.FC = () => {
                 const error = e as _Error;
                 const title = "Couldn't update DID Document :(";
                 setResultFragment(<Error title={title} message={error.description} />);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
         }
     };
@@ -140,7 +148,7 @@ const UpdateDDOT: React.FC = () => {
                 <Button
                     variant="outline-primary"
                     type="submit">
-                    Update DID Document
+                    {isLoading ? "Updating Document..." : "Update DID Document"}
                 </Button>
             </Form>
             <div style={{ paddingTop: "3rem" }}/>

@@ -12,9 +12,11 @@ import Success from "./lib/Success";
 
 const DeactivateDID: React.FC = () => {
     const [ resultFragment, setResultFragment ] = useState(<div/> as React.ReactFragment);
+    const [ isLoading, setIsLoading ] = useState(false);
 
 
     const handleSubmitForm = (event: FormEvent<HTMLFormElement>): void => {
+        setIsLoading(true);
         event.preventDefault();
         event.stopPropagation();
 
@@ -28,7 +30,10 @@ const DeactivateDID: React.FC = () => {
                 deactivatedDid: config.devDid.did.did,
                 controller: config.devDid.account
             };
-            setResultFragment(deactivatedDIDFragment(devResp));
+            setTimeout(() => {
+                setResultFragment(deactivatedDIDFragment(devResp));
+                setIsLoading(false);
+            }, config.devProcessMsec);
         } else {
             deactivateDID(did, passphrase)
             .then((resp) => {
@@ -39,6 +44,9 @@ const DeactivateDID: React.FC = () => {
                 const error = e as _Error;
                 const title = "Couldn't deactivate DID :(";
                 setResultFragment(<Error title={title} message={error.description} />);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
         }
     };
@@ -71,7 +79,7 @@ const DeactivateDID: React.FC = () => {
                 <Button
                     variant="outline-primary"
                     type="submit">
-                    Deactivate DID
+                    {isLoading ? "Deactivating..." : "Deactivate DID"}
                 </Button>
             </Form>
             <div style={{ paddingTop: "3rem" }}/>
