@@ -4,7 +4,7 @@ The source code for [WUBCO](https://wubco.blobaa.dev).
 
 This repository contains the source code for the **W**eb **U**I for **B**BA **C**RUD **O**perations website. It wraps the [bba DID method handler](https://github.com/blobaa/bba-did-method-handler-ts) to provide a human friendly access to the [bba DID method](https://github.com/blobaa/bba-did-method-specification).
 
-The generated files are available [here](https://github.com/blobaa/wubco-blobaa-dev).
+The generated files can be found [here](https://github.com/blobaa/wubco-blobaa-dev).
 
 
 ## Install
