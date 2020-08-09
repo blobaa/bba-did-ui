@@ -25,11 +25,11 @@ Create a `.env` file containing the following variables:
 
 | Variable            | Description                                                                                                                                          | Brief                                                                                                                        |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| RUN_ENV             | The run environment                                                                                                                                  | `dev` for development, `prod` for production. Deploying the website automatically sets this variable to prod. (Defaults to dev) |
-| MAINNET_URL         | The mainnet Ardor node url                                                                                                                           | defaults to https://ardor.jelurida.com                                                                                      |
-| TESTNET_URL         | The testnet Ardor node url                                                                                                                           | defaults to https://testardor.jelurida.com                                                                                  |
-| MIN_TESTNET_BALANCE | The minimum testnet IGNIS balance a DID controller must own to process a create, update or deactivate operation. The balance is used to pay the fees | defaults to 10                                                                                                              |
-| MIN_MAINNET_BALANCE | The minimum mainnet IGNIS balance a DID controller must own to process a create, update or deactivate operation. The balance is used to pay the fees | defaults to 2                                                                                                               |
+| RUN_ENV             | The run environment                                                                                                                                  | `dev` for development, `prod` for production. Deploying the website automatically sets this variable to prod. Defaults to `dev` |
+| MAINNET_URL         | The mainnet Ardor node url                                                                                                                           | Defaults to https://ardor.jelurida.com                                                                                      |
+| TESTNET_URL         | The testnet Ardor node url                                                                                                                           | Defaults to https://testardor.jelurida.com                                                                                  |
+| MIN_TESTNET_BALANCE | The minimum testnet IGNIS balance a DID controller must own to process a create, update or deactivate operation. The balance is used to pay the fees | Defaults to 10                                                                                                              |
+| MIN_MAINNET_BALANCE | The minimum mainnet IGNIS balance a DID controller must own to process a create, update or deactivate operation. The balance is used to pay the fees | Defaults to 2                                                                                                               |
 
 
 Use the `.env-sample` file as template.
@@ -81,7 +81,7 @@ npm run export
 ````
 
 
-The static website is now available within the `./out` folder.
+WUBCO is now available within the `./out` folder.
 
 
 #### GitHub Pages
