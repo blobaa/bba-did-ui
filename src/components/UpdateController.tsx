@@ -75,7 +75,7 @@ const UpdateController: React.FC = () => {
                         <Form.Label>Current DID Controller Passphrase:</Form.Label>
                         <Form.Control type="password" placeholder="Enter passphrase" />
                         <Form.Text className="text-muted">
-                            Your current Ardor account passphrase. Your passphrase never leaves the browser.
+                            Your current Ardor account passphrase.
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
@@ -85,7 +85,7 @@ const UpdateController: React.FC = () => {
                         <Form.Label>New DID Controller Passphrase:</Form.Label>
                         <Form.Control type="password" placeholder="Enter passphrase" />
                         <Form.Text className="text-muted">
-                            Your new Ardor account passphrase. This passphrase also never leaves the browser :).
+                            Your new Ardor account passphrase.
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
@@ -154,7 +154,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={updateControllerResponse.did}/>
                     <Form.Text className="text-muted">
-                        Your decentralized identifier (DID)
+                        Your decentralized identifier (DID).
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
@@ -168,7 +168,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={updateControllerResponse.oldControllerAccount}/>
                     <Form.Text className="text-muted">
-                        Your old DID controller account
+                        Your old DID controller account.
                     </Form.Text>
                 </Form.Group>
                 <Form.Group as={Col} sm="6">
@@ -179,7 +179,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={updateControllerResponse.newControllerAccount}/>
                     <Form.Text className="text-muted">
-                        Your new DID controller account
+                        Your new DID controller account.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>

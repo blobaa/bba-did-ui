@@ -105,7 +105,7 @@ const resolvedDIDFragment = (params: ResolveDIDResponse): React.ReactFragment =>
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.did}/>
                     <Form.Text className="text-muted">
-                        The resolved decentralized identifier (DID)
+                        The resolved decentralized identifier (DID).
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
@@ -117,7 +117,7 @@ const resolvedDIDFragment = (params: ResolveDIDResponse): React.ReactFragment =>
                         value={JSON.stringify(params.didDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
-                        The information linked to the DID
+                        The information linked to the DID.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>

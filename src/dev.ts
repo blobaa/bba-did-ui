@@ -26,7 +26,7 @@ const dev = {
         account: "Alice",
         newAccount: "Bob",
     },
-    processMsec: 2000
+    processMsec: 1000
 };
 
 export default dev;

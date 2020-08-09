@@ -73,7 +73,7 @@ const DeactivateDID: React.FC = () => {
                         <Form.Label>DID Controller Passphrase:</Form.Label>
                         <Form.Control type="password" placeholder="Enter passphrase" />
                         <Form.Text className="text-muted">
-                            Your Ardor account passphrase. Your passphrase never leaves the browser.
+                            Your Ardor account passphrase.
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
@@ -136,7 +136,7 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string; controller: s
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.deactivatedDid}/>
                     <Form.Text className="text-muted">
-                        Your deactivated decentralized identifier (DID)
+                        Your deactivated decentralized identifier (DID).
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
@@ -150,7 +150,7 @@ const deactivatedDIDFragment = (params: { deactivatedDid: string; controller: s
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.controller}/>
                     <Form.Text className="text-muted">
-                        Your last DID controller account
+                        Your last DID controller account.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>

@@ -77,7 +77,7 @@ const CreateDID: React.FC= () => {
                         <Form.Label>DID Controller Passphrase:</Form.Label>
                         <Form.Control type="password" placeholder="Enter passphrase" />
                         <Form.Text className="text-muted">
-                            Your Ardor account passphrase. Your passphrase never leaves the browser.
+                            Your Ardor account passphrase.
                         </Form.Text>
                     </Form.Group>
                 </Form.Row>
@@ -112,7 +112,7 @@ const CreateDID: React.FC= () => {
                                 <option>ED25519</option>
                             </Form.Control>
                             <Form.Text className="text-muted">
-                                Your DID Document Key Type
+                                Your DID Document Key Type.
                             </Form.Text>
                         </Form.Group>
                         <Form.Group as={Col} controlId="formKeyRelationship">
@@ -139,21 +139,21 @@ const CreateDID: React.FC= () => {
                             <Form.Label>Name:</Form.Label>
                             <Form.Control type="text" placeholder="Enter service name"/>
                             <Form.Text className="text-muted">
-                                The name of your service. Required for service creation
+                                The name of your service. Required for service creation.
                             </Form.Text>
                         </Form.Group>
                         <Form.Group as={Col} controlId="formServiceType">
                             <Form.Label>Type:</Form.Label>
                             <Form.Control type="text" placeholder="Enter service type"/>
                             <Form.Text className="text-muted">
-                                The type of your service. Required for service creation
+                                The type of your service. Required for service creation.
                             </Form.Text>
                         </Form.Group>
                         <Form.Group as={Col} controlId="formServiceUrl">
                             <Form.Label>URL:</Form.Label>
                             <Form.Control type="text" placeholder="Enter service endpoint URL"/>
                             <Form.Text className="text-muted">
-                                The endpoint of your service. Required for service creation
+                                The endpoint of your service. Required for service creation.
                             </Form.Text>
                         </Form.Group>
                     </Form.Row>
@@ -227,7 +227,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.did.did}/>
                     <Form.Text className="text-muted">
-                        Your decentralized identifier (DID)
+                        Your decentralized identifier (DID).
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
@@ -241,7 +241,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                         style={{ backgroundColor: "rgba(4, 159, 173, 0.05)" }}
                         value={params.controller}/>
                     <Form.Text className="text-muted">
-                        Your DID controller account
+                        Your DID controller account.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
@@ -253,7 +253,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                         value={JSON.stringify(params.did.didDocument, undefined, 2)}
                     />
                     <Form.Text className="text-muted">
-                        The information linked to your DID
+                        The information linked to your DID.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
