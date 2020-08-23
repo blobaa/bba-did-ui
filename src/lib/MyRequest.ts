@@ -5,13 +5,9 @@ import { Error, ErrorCode } from "@blobaa/bba-did-method-handler-ts";
 export default class MyRequest extends Request {
 
     public async getBalance(url: string, params: GetBalanceParams): Promise<GetBalanceResponse> {
-            console.log("myReq0");
-
         try {
-            console.log("myReq1");
             return await super.getBalance(url, params);
         } catch (error) {
-            console.log("myReq2");
             console.log(error);
             return Promise.reject(this.getError(error));
         }
