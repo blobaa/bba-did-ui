@@ -58,7 +58,7 @@ const ResolveDID: React.FC = () => {
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
                         <Form.Label>DID:</Form.Label>
-                        <Form.Control type="text" placeholder="Enter bba did" />
+                        <Form.Control type="text" placeholder="Enter bba DID" />
                         <Form.Text className="text-muted">
                             The bba DID you want to resolve.
                         </Form.Text>
@@ -131,7 +131,7 @@ const resolvedDIDFragment = (params: ResolveDIDResponse): React.ReactFragment =>
                         Save Resolved DID
                     </Button>
                     <Form.Text className="text-muted">
-                        Save the DID information shown above in a &lt;did&gt;.resolved.json file.
+                        Save the DID information shown above in a &lt;DID&gt;.resolved.json file.
                     </Form.Text>
 
                 </Form.Group>

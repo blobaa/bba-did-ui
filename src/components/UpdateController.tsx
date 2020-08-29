@@ -63,7 +63,7 @@ const UpdateController: React.FC = () => {
                 <Form.Row>
                     <Form.Group as={Col} sm="8" controlId="formDid">
                         <Form.Label>DID:</Form.Label>
-                        <Form.Control type="text" placeholder="Enter bba did" />
+                        <Form.Control type="text" placeholder="Enter bba DID" />
                         <Form.Text className="text-muted">
                             Your bba DID you want to update.
                         </Form.Text>
@@ -192,7 +192,7 @@ const updatedControllerFragment = (updateControllerResponse: UpdateDIDController
                         Save Updated DID
                     </Button>
                     <Form.Text className="text-muted">
-                        Save the DID information shown above in a &lt;did&gt;.updatedController.json file.
+                        Save the DID information shown above in a &lt;DID&gt;.updatedController.json file.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>

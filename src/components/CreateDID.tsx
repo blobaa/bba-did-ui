@@ -279,7 +279,7 @@ const createdDIDFragment = (params: {did: CreateDIDResponse; keyMaterial: DIDDoc
                         Save Created DID
                     </Button>
                     <Form.Text className="text-muted">
-                        Save the DID information shown above in a &lt;did&gt;.created.json file.
+                        Save the DID information shown above in a &lt;DID&gt;.created.json file.
                     </Form.Text>
                 </Form.Group>
             </Form.Row>
