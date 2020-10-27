@@ -46,7 +46,7 @@ const IS_DEV = isProd ? false : process.env.RUN_ENV === "prod" ? false : true;
 
 
 module.exports = withSass(withCss({
-    exportTrailingSlash: true,
+    trailingSlash: true,
     exportPathMap() {
         const pages = {};
         GET_ABLE_PAGES.forEach((page) => {
