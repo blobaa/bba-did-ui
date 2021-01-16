@@ -14,29 +14,29 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^13.5.2",
-    "@types/react": "^16.9.19",
+    "@types/node": "^13.13.40",
+    "@types/react": "^16.14.2",
     "@types/styled-jsx": "^2.2.8",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
     "eslint": "^6.8.0",
-    "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-react": "^7.20.5",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.22.0",
     "typescript": "^3.7.5"
   },
   "dependencies": {
-    "@blobaa/ardor-ts": "^2.8.1",
-    "@blobaa/bba-did-method-handler-ts": "^0.1.13",
+    "@blobaa/ardor-ts": "^2.8.2",
+    "@blobaa/bba-did-method-handler-ts": "^0.1.14",
     "@blobaa/did-document-ts": "^0.1.7",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-sass": "^1.0.1",
-    "bootstrap": "^4.5.1",
+    "bootstrap": "^4.5.3",
     "dotenv": "^8.2.0",
     "js-file-download": "^0.4.12",
-    "next": "^10.0.3",
+    "next": "^10.0.5",
     "node-sass": "^4.14.0",
-    "react": "^16.12.0",
-    "react-bootstrap": "^1.3.0",
-    "react-dom": "^16.12.0"
+    "react": "^16.14.0",
+    "react-bootstrap": "^1.4.3",
+    "react-dom": "^16.14.0"
   }
 }
